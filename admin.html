@@ -346,7 +346,7 @@ async function loadData(){
   try{
     const { data, error } = await sb.from("shop_data").select("value").eq("id", DATA_ROW_ID).maybeSingle();
     if(error) throw error;
-    if(data && data.value){
+    if(data && data.value && Object.keys(data.value).length){
       const d = data.value;
       return Object.assign(defaultData(), d, {
         meta: Object.assign(defaultData().meta, d.meta||{}),
