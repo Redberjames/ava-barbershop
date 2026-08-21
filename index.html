@@ -161,7 +161,7 @@ img{max-width:100%; display:block;}
 
 /* ============================= ANNOUNCEMENTS ============================= */
 #announce-strip{ background:var(--panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:12px 0; overflow:hidden; position:relative; }
-.marquee{ display:flex; gap:60px; white-space:nowrap; animation:marquee 26s linear infinite; }
+.marquee{ display:inline-flex; gap:60px; white-space:nowrap; animation:marquee 26s linear infinite; }
 .marquee span{ font-size:12.5px; letter-spacing:.1em; color:var(--ink-dim); display:flex; align-items:center; gap:10px; }
 .marquee b{ color:var(--accent); font-weight:600; }
 @keyframes marquee{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
@@ -370,10 +370,10 @@ img{max-width:100%; display:block;}
       <a href="#about">About</a>
       <a href="#services">Services</a>
       <a href="#gallery">Gallery</a>
-      <a href="#testimonials">Reviews</a>
       <a href="#announcements">News</a>
       <a href="#book">Book Now</a>
       <a href="#contact">Contact</a>
+      <a href="#testimonials">Reviews</a>
     </div>
     <button id="navburger" aria-label="Menu"><span></span></button>
   </nav>
@@ -404,22 +404,12 @@ img{max-width:100%; display:block;}
         <div class="hero-chip floaty" style="bottom:10%; right:-8%; --r:-1deg; animation-delay:1s;">★★★★★ Rated Chair</div>
       </div>
     </div>
-    <a href="#announcements" class="scrolldown"><span>Scroll</span><span class="bar"></span></a>
+    <a href="#about" class="scrolldown"><span>Scroll</span><span class="bar"></span></a>
   </section>
 
   <div id="announce-strip">
     <div class="marquee" id="marquee"></div>
   </div>
-
-  <section id="announcements" class="section">
-    <div class="container">
-      <div class="section-head reveal">
-        <div class="eyebrow">Latest</div>
-        <h2 class="section-title">Updates &amp; <em>Announcements</em></h2>
-      </div>
-      <div class="announce-grid" id="announceGrid"></div>
-    </div>
-  </section>
 
   <section id="about" class="section">
     <div class="container">
@@ -462,24 +452,13 @@ img{max-width:100%; display:block;}
     </div>
   </section>
 
-  <section id="testimonials" class="section">
+  <section id="announcements" class="section">
     <div class="container">
       <div class="section-head reveal">
-        <div class="eyebrow">Word On The Street</div>
-        <h2 class="section-title">Client <em>Love</em></h2>
+        <div class="eyebrow">Latest</div>
+        <h2 class="section-title">Updates &amp; <em>Announcements</em></h2>
       </div>
-      <div class="rating-summary reveal in" id="ratingSummary"></div>
-      <div class="testi-grid" id="testiGrid"></div>
-      <div class="review-form reveal in">
-        <h3>Rate Your Visit</h3>
-        <div class="helptext">Reviews are checked by the shop before they go live.</div>
-        <div class="field" style="margin-top:18px;"><label>Your Rating</label><div class="star-input" id="rvStars"><span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span></div></div>
-        <div class="row2" style="margin-top:16px;">
-          <div class="field"><label>Your Name</label><input id="rvName" placeholder="Juan Dela Cruz"></div>
-        </div>
-        <div class="field" style="margin-top:16px;"><label>Your Review</label><textarea id="rvText" rows="3" placeholder="Tell us about your visit..."></textarea></div>
-        <button class="btn btn-solid" id="rvSubmit" style="margin-top:18px;"><span>Submit Review</span></button>
-      </div>
+      <div class="announce-grid" id="announceGrid"></div>
     </div>
   </section>
 
@@ -528,6 +507,27 @@ img{max-width:100%; display:block;}
           <p style="color:var(--ink-dim); margin-top:6px; font-size:15px;" id="contactPhone">📞 +63 900 000 0000</p>
           <div class="social-row" id="socialRow"></div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="testimonials" class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">Word On The Street</div>
+        <h2 class="section-title">Client <em>Love</em></h2>
+      </div>
+      <div class="rating-summary reveal in" id="ratingSummary"></div>
+      <div class="testi-grid" id="testiGrid"></div>
+      <div class="review-form reveal in">
+        <h3>Rate Your Visit</h3>
+        <div class="helptext">Reviews are checked by the shop before they go live.</div>
+        <div class="field" style="margin-top:18px;"><label>Your Rating</label><div class="star-input" id="rvStars"><span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span></div></div>
+        <div class="row2" style="margin-top:16px;">
+          <div class="field"><label>Your Name</label><input id="rvName" placeholder="Juan Dela Cruz"></div>
+        </div>
+        <div class="field" style="margin-top:16px;"><label>Your Review</label><textarea id="rvText" rows="3" placeholder="Tell us about your visit..."></textarea></div>
+        <button class="btn btn-solid" id="rvSubmit" style="margin-top:18px;"><span>Submit Review</span></button>
       </div>
     </div>
   </section>
@@ -622,6 +622,7 @@ function defaultData(){
       aboutText:"Ava Barbershop was built on one idea: a great cut changes how you carry yourself. Every chair, every blade, every hot towel is part of a ritual — not just a haircut.",
       aboutPhoto:"https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=1000&auto=format&fit=crop",
       footTagline:"I don't sell haircuts, I sell confidence.",
+      marqueeText:"",
       address:"123 Confidence Ave, Makati City, Metro Manila",
       phone:"+63 900 000 0000",
       whatsapp:"",
@@ -784,11 +785,22 @@ function renderClient(){
   $("#yr").textContent = new Date().getFullYear();
   updateOpenChip();
 
-  // marquee
+  // marquee (runs across the full width strip between Home and the rest of the page)
   const activeAnn = DATA.announcements.filter(a=>a.active);
-  const marqueeItems = activeAnn.length ? activeAnn : [{kind:"Welcome", title:"Book your next cut today"}];
-  const mk = marqueeItems.map(a=>`<span><b>${esc(a.kind)}</b> ${esc(a.title)}</span>`).join("");
-  $("#marquee").innerHTML = mk + mk;
+  const customMarquee = (DATA.wordings.marqueeText||"").trim();
+  let marqueeUnit;
+  if(customMarquee){
+    marqueeUnit = `<span>${esc(customMarquee)}</span>`;
+  }else{
+    const marqueeItems = activeAnn.length ? activeAnn : [{kind:"Welcome", title:"Book your next cut today"}];
+    marqueeUnit = marqueeItems.map(a=>`<span><b>${esc(a.kind)}</b> ${esc(a.title)}</span>`).join("");
+  }
+  // Repeat the content several times so the strip fills the whole screen width edge-to-edge
+  // (not just the left side) no matter how short the text is, then duplicate that run once
+  // more so the CSS animation (translateX(-50%)) loops seamlessly instead of jumping.
+  let marqueeRun = "";
+  for(let i=0;i<8;i++) marqueeRun += marqueeUnit;
+  $("#marquee").innerHTML = marqueeRun + marqueeRun;
 
   // announcements grid
   $("#announceGrid").innerHTML = DATA.announcements.filter(a=>a.active).sort((a,b)=> b.date.localeCompare(a.date)).map(a=>`

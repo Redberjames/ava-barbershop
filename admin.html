@@ -295,6 +295,7 @@ function defaultData(){
       aboutText:"Ava Barbershop was built on one idea: a great cut changes how you carry yourself. Every chair, every blade, every hot towel is part of a ritual — not just a haircut.",
       aboutPhoto:"https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=1000&auto=format&fit=crop",
       footTagline:"I don't sell haircuts, I sell confidence.",
+      marqueeText:"",
       address:"123 Confidence Ave, Makati City, Metro Manila",
       phone:"+63 900 000 0000",
       whatsapp:"",
@@ -553,6 +554,13 @@ function pageWordings(){
         <div class="about-photo-preview" style="margin-top:14px; max-width:220px;">
           <img id="aboutPhotoPreview" src="${esc(w.aboutPhoto)}" style="width:100%; aspect-ratio:4/5; object-fit:cover; border-radius:10px; border:1px solid var(--line);" onerror="this.style.opacity=0.25">
         </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Announcement Bar (Scrolling Text)</h3>
+      <div class="admin-form">
+        <div class="field"><label>Custom Scrolling Text</label><input id="f_marqueeText" value="${esc(w.marqueeText)}" placeholder="Leave blank to auto-show your active announcements"></div>
+        <div class="helptext" style="margin-top:-6px;">This is the text that scrolls in the bar right under the homepage banner. Leave it blank and it will automatically show your active announcements instead.</div>
       </div>
     </div>
     <div class="card">
@@ -845,7 +853,7 @@ function wireAdminPage(page){
       Object.assign(DATA.wordings, {
         heroTitle: $("#f_heroTitle").value, heroSub: $("#f_heroSub").value,
         aboutTitle: $("#f_aboutTitle").value, aboutText: $("#f_aboutText").value, aboutPhoto,
-        footTagline: $("#f_footTagline").value, address: $("#f_address").value, phone: $("#f_phone").value, whatsapp: $("#f_whatsapp").value.trim(),
+        footTagline: $("#f_footTagline").value, marqueeText: $("#f_marqueeText").value.trim(), address: $("#f_address").value, phone: $("#f_phone").value, whatsapp: $("#f_whatsapp").value.trim(),
         instagram: $("#f_instagram").value.trim(), facebook: $("#f_facebook").value.trim(), tiktok: $("#f_tiktok").value.trim()
       });
       if(await persist()){ toast("Wordings saved.", "ok"); renderAdminPage(); }
