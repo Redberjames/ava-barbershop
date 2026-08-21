@@ -417,27 +417,41 @@ async function handleLoginSubmit(){
   const pw = $("#pwInput").value;
   const err = $("#loginErr");
   err.textContent = "";
-  if(!DATA.passwordHash){
-    const cf = $("#pwConfirm").value;
-    if(pw.length < 4){ err.textContent = "Password must be at least 4 characters."; return; }
-    if(pw !== cf){ err.textContent = "Passwords do not match."; return; }
-    DATA.passwordHash = await sha256(pw);
-    const ok = await persist();
-    if(!ok){ err.textContent = "Could not save password. Try again."; return; }
-    unlockAdmin();
-    toast("Admin password created.", "ok");
-    return;
+  try{
+    if(typeof crypto === "undefined" || !crypto.subtle){
+      err.textContent = "This page must be opened over https:// (not a local file) for login to work.";
+      return;
+    }
+    if(!DATA.passwordHash){
+      const cf = $("#pwConfirm").value;
+      if(pw.length < 4){ err.textContent = "Password must be at least 4 characters."; return; }
+      if(pw !== cf){ err.textContent = "Passwords do not match."; return; }
+      DATA.passwordHash = await sha256(pw);
+      const ok = await persist();
+      if(!ok){ err.textContent = "Could not save password. Try again."; return; }
+      unlockAdmin();
+      toast("Admin password created.", "ok");
+      return;
+    }
+    const hash = await sha256(pw);
+    if(hash === DATA.passwordHash){ unlockAdmin(); }
+    else{ err.textContent = "Incorrect password."; }
+  }catch(e){
+    console.error("Login failed:", e);
+    err.textContent = "Something went wrong: " + (e && e.message ? e.message : e);
   }
-  const hash = await sha256(pw);
-  if(hash === DATA.passwordHash){ unlockAdmin(); }
-  else{ err.textContent = "Incorrect password."; }
 }
 
 function unlockAdmin(){
   ADMIN_UNLOCKED = true;
   $("#adminLogin").classList.add("hidden");
   $("#adminShell").classList.remove("hidden");
-  renderAdminPage();
+  try{
+    renderAdminPage();
+  }catch(e){
+    console.error("renderAdminPage failed:", e);
+    $("#adminMain").innerHTML = "<div class='empty-state'>Something went wrong loading the dashboard. Check the browser console (F12) for details.</div>";
+  }
 }
 
 function renderAdminPage(){
