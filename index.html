@@ -544,16 +544,21 @@ img{max-width:100%; display:block;}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 /* ==========================================================================================
    AVA BARBERSHOP — single-file app. Client site + password-protected Admin CMS.
-   Data persistence: window.storage (shared=true for shop content so admin edits are
+   Data persistence: Supabase (public "shop_data" row, shared so admin edits are
    visible to every visitor; shared=false for a client's own personal booking history).
    ========================================================================================== */
 (function(){
 "use strict";
 
-const DATA_KEY = "ava_shop_data_v1";
+/* ---- Supabase config: fill these in from Project Settings -> API ---- */
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const DATA_ROW_ID = "main";
 const MY_BOOKINGS_KEY = "ava_my_bookings_v1";
 const DOW = ["sun","mon","tue","wed","thu","fri","sat"];
 const DOW_LABEL = {sun:"Sunday",mon:"Monday",tue:"Tuesday",wed:"Wednesday",thu:"Thursday",fri:"Friday",sat:"Saturday"};
@@ -637,19 +642,23 @@ function defaultData(){
 }
 
 let DATA = null;
-/* ---------------------------- Storage I/O ---------------------------- */
+/* ---------------------------- Storage I/O (Supabase) ----------------------------
+   Shop content lives in one row of the "shop_data" table, shared by every visitor
+   (that's how admin edits show up on the live site). A client's own booking
+   history is just a personal convenience list, kept in this browser only. */
 async function loadData(){
   try{
-    const res = await window.storage.get(DATA_KEY, true);
-    if(res && res.value){
-      const d = JSON.parse(res.value);
+    const { data, error } = await sb.from("shop_data").select("value").eq("id", DATA_ROW_ID).maybeSingle();
+    if(error) throw error;
+    if(data && data.value){
+      const d = data.value;
       return Object.assign(defaultData(), d, {
         meta: Object.assign(defaultData().meta, d.meta||{}),
         wordings: Object.assign(defaultData().wordings, d.wordings||{}),
         hours: Object.assign(defaultData().hours, d.hours||{})
       });
     }
-  }catch(e){ /* key not found yet */ }
+  }catch(e){ console.error("loadData failed", e); }
   const d = defaultData();
   await saveData(d);
   return d;
@@ -658,7 +667,8 @@ let saveTimer=null;
 async function saveData(d){
   d = d || DATA;
   try{
-    await window.storage.set(DATA_KEY, JSON.stringify(d), true);
+    const { error } = await sb.from("shop_data").upsert({ id: DATA_ROW_ID, value: d, updated_at: new Date().toISOString() });
+    if(error) throw error;
     return true;
   }catch(e){
     console.error("save failed", e);
@@ -668,15 +678,14 @@ async function saveData(d){
 }
 async function persist(){ return saveData(DATA); }
 
-async function loadMyBookings(){
+function loadMyBookings(){
   try{
-    const res = await window.storage.get(MY_BOOKINGS_KEY, false);
-    if(res && res.value) return JSON.parse(res.value);
-  }catch(e){}
-  return [];
+    const raw = localStorage.getItem(MY_BOOKINGS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
 }
-async function saveMyBookings(list){
-  try{ await window.storage.set(MY_BOOKINGS_KEY, JSON.stringify(list), false); }catch(e){}
+function saveMyBookings(list){
+  try{ localStorage.setItem(MY_BOOKINGS_KEY, JSON.stringify(list||[])); }catch(e){}
 }
 
 /* ---------------------------- Theming ---------------------------- */
