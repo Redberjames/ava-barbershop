@@ -786,7 +786,7 @@ function renderClient(){
   } else { $("#waFab").classList.add("hidden"); }
 
   // booking service select
-  $("#bkService").innerHTML = DATA.services.map(s=>`<option value="${s.id}">${esc(s.name)} — $${s.price} (${s.duration}min)</option>`).join("");
+  $("#bkService").innerHTML = DATA.services.map(s=>`<option value="${s.id}">${esc(s.name)} — ₱${s.price} (${s.duration}min)</option>`).join("");
 
   initCalendar();
   renderMyBookings();
@@ -797,7 +797,7 @@ function renderServiceGrid(cat){
   const list = cat==="All" ? DATA.services : DATA.services.filter(s=>(s.category||"General")===cat);
   $("#svcGrid").innerHTML = list.map(s=>`
     <div class="svc-card reveal in">
-      <div class="row"><h3>${esc(s.name)}</h3><div class="price">$${s.price}</div></div>
+      <div class="row"><h3>${esc(s.name)}</h3><div class="price">₱${s.price}</div></div>
       <p>${esc(s.desc||"")}</p>
       <div class="meta"><span>⏱ ${s.duration} min</span><span>${esc(s.category||"General")}</span></div>
     </div>`).join("") || `<div class="empty-state">No services listed yet.</div>`;

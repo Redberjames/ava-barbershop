@@ -492,7 +492,7 @@ function pageDashboard(){
       <div class="stat-card"><div class="n">${todayCount}</div><div class="l">Bookings Today</div></div>
       <div class="stat-card"><div class="n">${pending}</div><div class="l">Pending Approval</div></div>
       <div class="stat-card"><div class="n">${DATA.services.length}</div><div class="l">Active Services</div></div>
-      <div class="stat-card"><div class="n">$${revenue}</div><div class="l">Confirmed Revenue</div></div>
+      <div class="stat-card"><div class="n">₱${revenue}</div><div class="l">Confirmed Revenue</div></div>
     </div>
     <div class="card">
       <h3>Upcoming Bookings (Next 7 Days)</h3>
@@ -600,7 +600,7 @@ function pageServices(){
         <div class="row3">
           <div class="field"><label>Name</label><input id="s_name" placeholder="e.g. Skin Fade"></div>
           <div class="field"><label>Category</label><input id="s_cat" placeholder="e.g. Haircuts" list="catList"><datalist id="catList">${Array.from(new Set(DATA.services.map(s=>s.category))).map(c=>`<option value="${esc(c)}">`).join("")}</datalist></div>
-          <div class="field"><label>Price ($)</label><input id="s_price" type="number" min="0" placeholder="25"></div>
+          <div class="field"><label>Price (₱)</label><input id="s_price" type="number" min="0" placeholder="25"></div>
         </div>
         <div class="row2">
           <div class="field"><label>Duration (minutes)</label><input id="s_dur" type="number" min="5" step="5" placeholder="30"></div>
@@ -618,7 +618,7 @@ function renderSvcList(){
   if(!DATA.services.length) return `<div class="empty-state">No services yet.</div>`;
   return DATA.services.map(s=>`
     <div class="list-row">
-      <div class="main"><b>${esc(s.name)}</b><div class="m2">${esc(s.category)} · $${s.price} · ${s.duration} min — ${esc(s.desc||"")}</div></div>
+      <div class="main"><b>${esc(s.name)}</b><div class="m2">${esc(s.category)} · ₱${s.price} · ${s.duration} min — ${esc(s.desc||"")}</div></div>
       <div class="acts"><button class="icon-btn del" data-del="${s.id}" title="Delete">✕</button></div>
     </div>`).join("");
 }
@@ -684,7 +684,7 @@ function renderAdminBookList(){
   const list = DATA.bookings.filter(b=>b.date===adminSelectedDate).sort((a,b)=>a.time.localeCompare(b.time));
   $("#admBookList").innerHTML = list.length ? list.map(b=>`
     <div class="list-row">
-      <div class="main"><b>${fmtTime12(b.time)} · ${esc(b.name)}</b><div class="m2">${esc(b.serviceName)} · $${b.price} · 📞 ${esc(b.phone)}${b.notes?(' · '+esc(b.notes)):''}</div></div>
+      <div class="main"><b>${fmtTime12(b.time)} · ${esc(b.name)}</b><div class="m2">${esc(b.serviceName)} · ₱${b.price} · 📞 ${esc(b.phone)}${b.notes?(' · '+esc(b.notes)):''}</div></div>
       <div class="acts">
         <span class="pill ${b.status}">${b.status}</span>
         ${b.status!=="confirmed" ? `<button class="icon-btn" data-conf="${b.id}" title="Confirm">✓</button>`:""}
