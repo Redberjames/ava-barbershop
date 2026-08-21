@@ -295,6 +295,8 @@ function defaultData(){
       aboutText:"Ava Barbershop was built on one idea: a great cut changes how you carry yourself. Every chair, every blade, every hot towel is part of a ritual — not just a haircut.",
       aboutPhoto:"https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=1000&auto=format&fit=crop",
       footTagline:"I don't sell haircuts, I sell confidence.",
+      marqueeKind:"Welcome",
+      marqueeText:"Book your next cut today",
       address:"123 Confidence Ave, Makati City, Metro Manila",
       phone:"+63 900 000 0000",
       whatsapp:"",
@@ -548,6 +550,16 @@ function pageWordings(){
       </div>
     </div>
     <div class="card">
+      <h3>Ticker / Marquee</h3>
+      <div class="admin-form">
+        <div class="helptext" style="margin-top:-4px;">This scrolling bar sits right under the hero. Active announcements show here automatically — the text below is only used as a default welcome message when there are no active announcements.</div>
+        <div class="row2">
+          <div class="field"><label>Label</label><input id="f_marqueeKind" value="${esc(w.marqueeKind)}" placeholder="Welcome"></div>
+          <div class="field"><label>Message</label><input id="f_marqueeText" value="${esc(w.marqueeText)}" placeholder="Book your next cut today"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
       <h3>Footer &amp; Contact</h3>
       <div class="admin-form">
         <div class="field"><label>Footer Tagline</label><input id="f_footTagline" value="${esc(w.footTagline)}"></div>
@@ -703,6 +715,7 @@ function renderAdminBookList(){
 }
 
 /* ---- Gallery ---- */
+const GAL_MAX_UPLOAD = 10;
 function pageGallery(){
   return topbar("Gallery", "Add, caption, and remove photos shown to clients.") + `
     <div class="card">
@@ -710,12 +723,12 @@ function pageGallery(){
       <div class="admin-form">
         <div class="row2">
           <div class="field"><label>Image URL</label><input id="g_url" placeholder="https://..."></div>
-          <div class="field"><label>Or Upload From Device</label><input id="g_file" type="file" accept="image/*"></div>
+          <div class="field"><label>Or Upload From Device (up to ${GAL_MAX_UPLOAD} at once)</label><input id="g_file" type="file" accept="image/*" multiple></div>
         </div>
         <div class="field"><label>Caption</label><input id="g_cap" placeholder="e.g. Fresh skin fade"></div>
       </div>
       <button class="btn btn-solid btn-sm" id="addGal" style="margin-top:14px;"><span>Add To Gallery</span></button>
-      <div class="helptext" style="margin-top:10px;">Tip: paste an image link, or upload a photo (it will be resized automatically to keep the site fast).</div>
+      <div class="helptext" id="galUploadHelp" style="margin-top:10px;">Tip: paste an image link, or select multiple photos to upload them all at once (each is resized automatically to keep the site fast). When uploading several photos, the caption above is applied to all of them.</div>
     </div>
     <div class="card">
       <h3>Gallery (${DATA.gallery.length})</h3>
@@ -837,7 +850,7 @@ function wireAdminPage(page){
       Object.assign(DATA.wordings, {
         heroTitle: $("#f_heroTitle").value, heroSub: $("#f_heroSub").value,
         aboutTitle: $("#f_aboutTitle").value, aboutText: $("#f_aboutText").value, aboutPhoto,
-        footTagline: $("#f_footTagline").value, address: $("#f_address").value, phone: $("#f_phone").value, whatsapp: $("#f_whatsapp").value.trim(),
+        footTagline: $("#f_footTagline").value, marqueeKind: $("#f_marqueeKind").value.trim(), marqueeText: $("#f_marqueeText").value.trim(), address: $("#f_address").value, phone: $("#f_phone").value, whatsapp: $("#f_whatsapp").value.trim(),
         instagram: $("#f_instagram").value.trim(), facebook: $("#f_facebook").value.trim(), tiktok: $("#f_tiktok").value.trim()
       });
       if(await persist()){ toast("Wordings saved.", "ok"); renderAdminPage(); }
@@ -896,16 +909,44 @@ function wireAdminPage(page){
   }
   if(page==="gallery"){
     $("#addGal").onclick = async ()=>{
-      let url = $("#g_url").value.trim();
-      const file = $("#g_file").files[0];
-      if(file){ try{ url = await resizeImageFile(file, 900); }catch(e){ toast("Could not read that image.","err"); return; } }
-      if(!url){ toast("Add an image URL or upload a photo.","err"); return; }
-      DATA.gallery.push({ id:uid(), url, caption:$("#g_cap").value.trim() });
+      const url = $("#g_url").value.trim();
+      const files = Array.from($("#g_file").files||[]);
+      const cap = $("#g_cap").value.trim();
+      const btn = $("#addGal");
+
+      if(!files.length && !url){ toast("Add an image URL or upload a photo.","err"); return; }
+      if(files.length > GAL_MAX_UPLOAD){ toast(`Please select up to ${GAL_MAX_UPLOAD} photos at a time.`,"err"); return; }
+
+      btn.disabled = true;
+      const added = [];
+      try{
+        if(files.length){
+          for(let i=0;i<files.length;i++){
+            btn.querySelector("span").textContent = `Uploading ${i+1} of ${files.length}…`;
+            const dataUrl = await resizeImageFile(files[i], 900);
+            added.push({ id:uid(), url:dataUrl, caption:cap });
+          }
+        }else{
+          added.push({ id:uid(), url, caption:cap });
+        }
+      }catch(e){
+        toast("Could not read one of those images.","err");
+        btn.disabled = false; btn.querySelector("span").textContent = "Add To Gallery";
+        return;
+      }
+
+      DATA.gallery.push(...added);
       const ok = await persist();
-      if(!ok){ DATA.gallery.pop(); return; }
-      toast("Photo added.","ok"); $("#g_url").value=""; $("#g_cap").value=""; $("#g_file").value="";
+      btn.disabled = false; btn.querySelector("span").textContent = "Add To Gallery";
+      if(!ok){ DATA.gallery.splice(DATA.gallery.length-added.length, added.length); return; }
+      toast(added.length>1 ? `${added.length} photos added.` : "Photo added.", "ok");
+      $("#g_url").value=""; $("#g_cap").value=""; $("#g_file").value="";
       $("#galAdminGrid").innerHTML = renderGalAdminGrid();
     };
+    $("#g_file").addEventListener("change", e=>{
+      const n = e.target.files.length;
+      if(n > GAL_MAX_UPLOAD){ toast(`You selected ${n} photos — please select up to ${GAL_MAX_UPLOAD} at a time.`,"err"); }
+    });
     $("#galAdminGrid").addEventListener("click", async e=>{
       const d = e.target.closest("[data-delg]"); if(!d) return;
       DATA.gallery = DATA.gallery.filter(g=>g.id!==d.dataset.delg);
