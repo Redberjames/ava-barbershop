@@ -104,14 +104,14 @@ img{max-width:100%; display:block;}
 .empty-state .ic{ font-size:30px; margin-bottom:10px; }
 
 /* ============================= ADMIN ============================= */
-#adminApp{ min-height:100vh; background:var(--bg); }
-.admin-login{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+#adminApp{ min-height:100vh; min-height:100svh; background:var(--bg); }
+.admin-login{ min-height:100vh; min-height:100svh; display:flex; align-items:center; justify-content:center; padding:20px; }
 .login-card{ width:100%; max-width:400px; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-lg); padding:44px 36px; text-align:center; }
 .login-card img{ width:70px; margin:0 auto 18px; }
 .login-card h2{ font-size:26px; letter-spacing:.05em; }
 .login-card .sub{ color:var(--ink-dim); font-size:13.5px; margin-top:8px; margin-bottom:26px; }
-.admin-shell{ display:grid; grid-template-columns:250px 1fr; min-height:100vh; }
-.admin-side{ background:var(--bg-1); border-right:1px solid var(--line); padding:26px 18px; position:sticky; top:0; height:100vh; overflow-y:auto; }
+.admin-shell{ display:grid; grid-template-columns:250px 1fr; min-height:100vh; min-height:100svh; }
+.admin-side{ background:var(--bg-1); border-right:1px solid var(--line); padding:26px 18px; position:sticky; top:0; height:100vh; height:100svh; overflow-y:auto; }
 .admin-side .brand{ padding:0 8px 22px; border-bottom:1px solid var(--line); margin-bottom:18px;}
 .admin-nav a{ display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:8px; color:var(--ink-dim); font-size:13.5px; margin-bottom:4px; transition:.2s; }
 .admin-nav a .ic{ width:18px; text-align:center; opacity:.8;}
