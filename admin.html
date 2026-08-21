@@ -331,9 +331,9 @@ function defaultData(){
       {id:uid(), url:"https://images.unsplash.com/photo-1605497788044-5a32c7078486?q=80&w=900&auto=format&fit=crop", caption:"Beard shape-up"}
     ],
     testimonials:[
-      {id:uid(), name:"Marco R.", stars:5, text:"Best fade I've had in this city. The chair experience alone is worth it."},
-      {id:uid(), name:"Diego T.", stars:5, text:"Walked in stressed, walked out feeling like a new man. Ava Barbershop gets it."},
-      {id:uid(), name:"Liam S.", stars:5, text:"Hot towel shave is unreal. Booking the calendar was so easy too."}
+      {id:uid(), name:"Marco R.", stars:5, text:"Best fade I've had in this city. The chair experience alone is worth it.", date:fmtDateKey(new Date()), approved:true, source:"admin"},
+      {id:uid(), name:"Diego T.", stars:5, text:"Walked in stressed, walked out feeling like a new man. Ava Barbershop gets it.", date:fmtDateKey(new Date()), approved:true, source:"admin"},
+      {id:uid(), name:"Liam S.", stars:5, text:"Hot towel shave is unreal. Booking the calendar was so easy too.", date:fmtDateKey(new Date()), approved:true, source:"admin"}
     ],
     bookings:[],
     passwordHash:null
@@ -351,15 +351,23 @@ async function loadData(){
     if(error) throw error;
     if(data && data.value && Object.keys(data.value).length){
       const d = data.value;
-      return Object.assign(defaultData(), d, {
+      const merged = Object.assign(defaultData(), d, {
         meta: Object.assign(defaultData().meta, d.meta||{}),
         wordings: Object.assign(defaultData().wordings, d.wordings||{}),
         hours: Object.assign(defaultData().hours, d.hours||{})
       });
+      normalizeData(merged);
+      return merged;
     }
   }catch(e){ console.error("loadData failed", e); }
   const d = defaultData();
   await saveData(d);
+  return d;
+}
+/* Backfill fields on records saved before certain features existed (see
+   matching comment in index.html) so older shop data keeps working. */
+function normalizeData(d){
+  d.testimonials = (d.testimonials||[]).map(t=> Object.assign({ date: fmtDateKey(new Date()), approved:true, source:"admin" }, t));
   return d;
 }
 let saveTimer=null;
@@ -433,7 +441,7 @@ async function handleLoginSubmit(){
     }
     if(!DATA.passwordHash){
       const cf = $("#pwConfirm").value;
-      if(pw.length < 4){ err.textContent = "Password must be at least 4 characters."; return; }
+      if(pw.length < 6){ err.textContent = "Password must be at least 6 characters."; return; }
       if(pw !== cf){ err.textContent = "Passwords do not match."; return; }
       DATA.passwordHash = await sha256(pw);
       const ok = await persist();
@@ -482,6 +490,7 @@ function topbar(title, sub){
 function pageDashboard(){
   const todayKey = fmtDateKey(new Date());
   const pending = DATA.bookings.filter(b=>b.status==="pending").length;
+  const pendingReviews = DATA.testimonials.filter(t=>t.approved===false).length;
   const todayCount = DATA.bookings.filter(b=>b.date===todayKey && b.status!=="cancelled").length;
   const weekAhead = new Date(); weekAhead.setDate(weekAhead.getDate()+7);
   const upcoming = DATA.bookings.filter(b=> b.status!=="cancelled" && parseDateKey(b.date) >= new Date(new Date().setHours(0,0,0,0)) && parseDateKey(b.date) <= weekAhead)
@@ -491,7 +500,7 @@ function pageDashboard(){
     <div class="stat-grid">
       <div class="stat-card"><div class="n">${todayCount}</div><div class="l">Bookings Today</div></div>
       <div class="stat-card"><div class="n">${pending}</div><div class="l">Pending Approval</div></div>
-      <div class="stat-card"><div class="n">${DATA.services.length}</div><div class="l">Active Services</div></div>
+      <div class="stat-card"><div class="n">${pendingReviews}</div><div class="l">Pending Reviews</div></div>
       <div class="stat-card"><div class="n">₱${revenue}</div><div class="l">Confirmed Revenue</div></div>
     </div>
     <div class="card">
@@ -536,7 +545,14 @@ function pageWordings(){
       <div class="admin-form">
         <div class="field"><label>About Title</label><input id="f_aboutTitle" value="${esc(w.aboutTitle)}"></div>
         <div class="field"><label>About Text</label><textarea id="f_aboutText" rows="4">${esc(w.aboutText)}</textarea></div>
-        <div class="field"><label>About Photo URL</label><input id="f_aboutPhoto" value="${esc(w.aboutPhoto)}"></div>
+        <div class="row2">
+          <div class="field"><label>About Photo URL</label><input id="f_aboutPhoto" value="${esc(w.aboutPhoto)}" placeholder="https://..."></div>
+          <div class="field"><label>Or Upload From Device</label><input id="f_aboutPhotoFile" type="file" accept="image/*"></div>
+        </div>
+        <div class="helptext" style="margin-top:-6px;">Tip: paste an image link, or upload a photo (it will be resized automatically to keep the site fast).</div>
+        <div class="about-photo-preview" style="margin-top:14px; max-width:220px;">
+          <img id="aboutPhotoPreview" src="${esc(w.aboutPhoto)}" style="width:100%; aspect-ratio:4/5; object-fit:cover; border-radius:10px; border:1px solid var(--line);" onerror="this.style.opacity=0.25">
+        </div>
       </div>
     </div>
     <div class="card">
@@ -582,7 +598,7 @@ function renderAnnList(){
   if(!DATA.announcements.length) return `<div class="empty-state">No announcements yet.</div>`;
   return DATA.announcements.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(a=>`
     <div class="list-row">
-      <div class="main"><b>${esc(a.title)}</b><div class="m2">${esc(a.kind)} · ${fmtDisplayDate(a.date)} · ${esc(a.body).slice(0,70)}${a.body.length>70?'…':''}</div></div>
+      <div class="main"><b>${esc(a.title)}</b><div class="m2">${esc(a.kind)} · ${fmtDisplayDate(a.date)} · ${esc(a.body.slice(0,70))}${a.body.length>70?'…':''}</div></div>
       <div class="acts">
         <span class="pill ${a.active?'confirmed':'cancelled'}">${a.active?'live':'hidden'}</span>
         <button class="icon-btn" data-tog="${a.id}" title="Toggle visibility">${a.active?'🙈':'👁'}</button>
@@ -744,30 +760,42 @@ function resizeImageFile(file, maxDim){
 
 /* ---- Testimonials ---- */
 function pageTestimonials(){
-  return topbar("Testimonials", "Feature client reviews on your site.") + `
+  const pending = DATA.testimonials.filter(t=>t.approved===false);
+  const published = DATA.testimonials.filter(t=>t.approved!==false);
+  return topbar("Testimonials & Reviews", "Feature client reviews, and approve reviews clients submit on the live site.") + `
+    ${pending.length ? `<div class="card">
+      <h3>Pending Approval (${pending.length})</h3>
+      <div class="helptext" style="margin-bottom:10px;">Submitted by clients on the site. Approve to publish, or reject to discard.</div>
+      <div id="testiPendingList">${renderTestiList(pending, true)}</div>
+    </div>` : ""}
     <div class="card">
       <h3>Add Testimonial</h3>
       <div class="admin-form">
         <div class="row3">
           <div class="field"><label>Client Name</label><input id="t_name" placeholder="e.g. Marco R."></div>
-          <div class="field"><label>Stars</label><select id="t_stars"><option>5</option><option>4</option><option>3</option></select></div>
+          <div class="field"><label>Stars</label><select id="t_stars"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div>
           <div></div>
         </div>
         <div class="field"><label>Review Text</label><textarea id="t_text" rows="2" placeholder="What did they say?"></textarea></div>
       </div>
       <button class="btn btn-solid btn-sm" id="addTesti" style="margin-top:14px;"><span>Add Testimonial</span></button>
+      <div class="helptext" style="margin-top:10px;">Testimonials added here go live immediately — they don't need approval.</div>
     </div>
     <div class="card">
-      <h3>All Testimonials</h3>
-      <div id="testiList">${renderTestiList()}</div>
+      <h3>Published (${published.length})</h3>
+      <div id="testiList">${renderTestiList(published, false)}</div>
     </div>`;
 }
-function renderTestiList(){
-  if(!DATA.testimonials.length) return `<div class="empty-state">None yet.</div>`;
-  return DATA.testimonials.map(t=>`
+function renderTestiList(list, isPending){
+  list = list || DATA.testimonials;
+  if(!list.length) return `<div class="empty-state">None yet.</div>`;
+  return list.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(t=>`
     <div class="list-row">
-      <div class="main"><b>${esc(t.name)}</b> <span style="color:var(--accent);">${"★".repeat(t.stars)}</span><div class="m2">${esc(t.text)}</div></div>
-      <div class="acts"><button class="icon-btn del" data-delt="${t.id}">✕</button></div>
+      <div class="main"><b>${esc(t.name)}</b> <span style="color:var(--accent);">${"★".repeat(t.stars)}${"☆".repeat(5-t.stars)}</span><div class="m2">${esc(t.text)}${t.date?(' · '+fmtDisplayDate(t.date)):''}</div></div>
+      <div class="acts">
+        ${isPending ? `<button class="icon-btn" data-approve="${t.id}" title="Approve">✓</button>` : ""}
+        <button class="icon-btn del" data-delt="${t.id}" title="${isPending?'Reject':'Delete'}">✕</button>
+      </div>
     </div>`).join("");
 }
 
@@ -796,15 +824,31 @@ function pageSettings(){
 /* ---- Wire admin page interactions ---- */
 function wireAdminPage(page){
   if(page==="wordings"){
+    const preview = $("#aboutPhotoPreview");
+    $("#f_aboutPhoto").addEventListener("input", e=>{ if(preview) preview.src = e.target.value.trim(); });
+    $("#f_aboutPhotoFile").addEventListener("change", async e=>{
+      const file = e.target.files[0]; if(!file) return;
+      try{
+        const dataUrl = await resizeImageFile(file, 1000);
+        $("#f_aboutPhoto").value = dataUrl;
+        if(preview) preview.src = dataUrl;
+      }catch(err){ toast("Could not read that image.", "err"); }
+    });
     $("#saveWordings").onclick = async ()=>{
+      let aboutPhoto = $("#f_aboutPhoto").value.trim();
+      const file = $("#f_aboutPhotoFile").files[0];
+      if(file){
+        try{ aboutPhoto = await resizeImageFile(file, 1000); }
+        catch(e){ toast("Could not read that image.", "err"); return; }
+      }
       Object.assign(DATA.meta, { name: $("#f_name").value.trim()||"Ava Barbershop", tagline: $("#f_tagline").value.trim(), yearsCutting: +$("#f_years").value||5 });
       Object.assign(DATA.wordings, {
         heroTitle: $("#f_heroTitle").value, heroSub: $("#f_heroSub").value,
-        aboutTitle: $("#f_aboutTitle").value, aboutText: $("#f_aboutText").value, aboutPhoto: $("#f_aboutPhoto").value.trim(),
+        aboutTitle: $("#f_aboutTitle").value, aboutText: $("#f_aboutText").value, aboutPhoto,
         footTagline: $("#f_footTagline").value, address: $("#f_address").value, phone: $("#f_phone").value, whatsapp: $("#f_whatsapp").value.trim(),
         instagram: $("#f_instagram").value.trim(), facebook: $("#f_facebook").value.trim(), tiktok: $("#f_tiktok").value.trim()
       });
-      if(await persist()){ toast("Wordings saved.", "ok"); }
+      if(await persist()){ toast("Wordings saved.", "ok"); renderAdminPage(); }
     };
   }
   if(page==="announcements"){
@@ -880,14 +924,26 @@ function wireAdminPage(page){
     $("#addTesti").onclick = async ()=>{
       const name = $("#t_name").value.trim(), text = $("#t_text").value.trim();
       if(!name || !text){ toast("Please fill name and review text.","err"); return; }
-      DATA.testimonials.push({ id:uid(), name, stars:+$("#t_stars").value||5, text });
-      if(await persist()){ toast("Testimonial added.","ok"); $("#t_name").value=""; $("#t_text").value=""; $("#testiList").innerHTML = renderTestiList(); }
+      DATA.testimonials.push({ id:uid(), name, stars:+$("#t_stars").value||5, text, date:fmtDateKey(new Date()), approved:true, source:"admin" });
+      if(await persist()){ toast("Testimonial added.","ok"); renderAdminPage(); }
     };
-    $("#testiList").addEventListener("click", async e=>{
-      const d = e.target.closest("[data-delt]"); if(!d) return;
-      DATA.testimonials = DATA.testimonials.filter(t=>t.id!==d.dataset.delt);
-      if(await persist()){ $("#testiList").innerHTML = renderTestiList(); toast("Removed.","ok"); }
-    });
+    const handleListClick = async e=>{
+      const approve = e.target.closest("[data-approve]");
+      const del = e.target.closest("[data-delt]");
+      if(approve){
+        const t = DATA.testimonials.find(x=>x.id===approve.dataset.approve);
+        if(t) t.approved = true;
+        if(await persist()){ toast("Review approved.","ok"); renderAdminPage(); }
+        return;
+      }
+      if(del){
+        const wasPending = DATA.testimonials.find(x=>x.id===del.dataset.delt)?.approved===false;
+        DATA.testimonials = DATA.testimonials.filter(t=>t.id!==del.dataset.delt);
+        if(await persist()){ toast(wasPending?"Review rejected.":"Removed.","ok"); renderAdminPage(); }
+      }
+    };
+    const pendingList = $("#testiPendingList"); if(pendingList) pendingList.addEventListener("click", handleListClick);
+    $("#testiList").addEventListener("click", handleListClick);
   }
   if(page==="settings"){
     $all(".swatch").forEach(sw=> sw.addEventListener("click", async ()=>{
@@ -898,7 +954,7 @@ function wireAdminPage(page){
     }));
     $("#changePw").onclick = async ()=>{
       const p1 = $("#np1").value, p2 = $("#np2").value;
-      if(p1.length<4){ toast("Password must be at least 4 characters.","err"); return; }
+      if(p1.length<6){ toast("Password must be at least 6 characters.","err"); return; }
       if(p1!==p2){ toast("Passwords do not match.","err"); return; }
       DATA.passwordHash = await sha256(p1);
       if(await persist()){ toast("Password updated.","ok"); $("#np1").value=""; $("#np2").value=""; }

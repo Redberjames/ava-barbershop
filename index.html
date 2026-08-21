@@ -217,6 +217,20 @@ img{max-width:100%; display:block;}
 .testi-card .stars{ color:var(--accent); font-size:14px; letter-spacing:2px; }
 .testi-card p{ font-family:'Cormorant Garamond'; font-style:italic; font-size:19px; line-height:1.6; color:var(--ink); margin-top:16px; }
 .testi-card .who{ margin-top:18px; font-size:12.5px; color:var(--ink-faint); letter-spacing:.06em; text-transform:uppercase; }
+.rating-summary{ display:flex; align-items:center; gap:22px; flex-wrap:wrap; margin:-30px 0 40px; }
+.rating-summary .avg{ font-family:'Bebas Neue'; font-size:44px; color:var(--accent); line-height:1; }
+.rating-summary .stars{ color:var(--accent); font-size:16px; letter-spacing:2px; }
+.rating-summary .count{ color:var(--ink-faint); font-size:13px; }
+.rating-summary .seeall{ margin-left:auto; font-size:12.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-dim); border-bottom:1px solid var(--line); padding-bottom:2px; transition:color .25s,border-color .25s; }
+.rating-summary .seeall:hover{ color:var(--accent); border-color:var(--accent); }
+.review-form{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-lg); padding:36px; margin-top:32px; }
+.review-form h3{ font-family:'Jost'; font-weight:600; font-size:17px; letter-spacing:.02em; }
+.review-form .helptext{ font-size:12px; color:var(--ink-faint); margin-top:6px; }
+.star-input{ display:inline-flex; gap:6px; font-size:26px; line-height:1; cursor:pointer; }
+.star-input span{ color:var(--line); transition:color .15s, transform .15s; }
+.star-input span.on{ color:var(--accent); }
+.star-input span:hover{ transform:scale(1.12); }
+
 
 /* ============================= HOURS / CONTACT ============================= */
 .hours-list{ display:grid; gap:0; border-top:1px solid var(--line); }
@@ -356,6 +370,7 @@ img{max-width:100%; display:block;}
       <a href="#about">About</a>
       <a href="#services">Services</a>
       <a href="#gallery">Gallery</a>
+      <a href="#testimonials">Reviews</a>
       <a href="#announcements">News</a>
       <a href="#book">Book Now</a>
       <a href="#contact">Contact</a>
@@ -453,7 +468,18 @@ img{max-width:100%; display:block;}
         <div class="eyebrow">Word On The Street</div>
         <h2 class="section-title">Client <em>Love</em></h2>
       </div>
+      <div class="rating-summary reveal in" id="ratingSummary"></div>
       <div class="testi-grid" id="testiGrid"></div>
+      <div class="review-form reveal in">
+        <h3>Rate Your Visit</h3>
+        <div class="helptext">Reviews are checked by the shop before they go live.</div>
+        <div class="field" style="margin-top:18px;"><label>Your Rating</label><div class="star-input" id="rvStars"><span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span></div></div>
+        <div class="row2" style="margin-top:16px;">
+          <div class="field"><label>Your Name</label><input id="rvName" placeholder="Juan Dela Cruz"></div>
+        </div>
+        <div class="field" style="margin-top:16px;"><label>Your Review</label><textarea id="rvText" rows="3" placeholder="Tell us about your visit..."></textarea></div>
+        <button class="btn btn-solid" id="rvSubmit" style="margin-top:18px;"><span>Submit Review</span></button>
+      </div>
     </div>
   </section>
 
@@ -518,7 +544,7 @@ img{max-width:100%; display:block;}
         </div>
         <div>
           <h4>Explore</h4>
-          <ul><li><a href="#services">Services</a></li><li><a href="#gallery">Gallery</a></li><li><a href="#book">Book Now</a></li><li><a href="#about">About</a></li></ul>
+          <ul><li><a href="#services">Services</a></li><li><a href="#gallery">Gallery</a></li><li><a href="#book">Book Now</a></li><li><a href="reviews.html">All Reviews</a></li></ul>
         </div>
         <div>
           <h4>Info</h4>
@@ -632,9 +658,9 @@ function defaultData(){
       {id:uid(), url:"https://images.unsplash.com/photo-1605497788044-5a32c7078486?q=80&w=900&auto=format&fit=crop", caption:"Beard shape-up"}
     ],
     testimonials:[
-      {id:uid(), name:"Marco R.", stars:5, text:"Best fade I've had in this city. The chair experience alone is worth it."},
-      {id:uid(), name:"Diego T.", stars:5, text:"Walked in stressed, walked out feeling like a new man. Ava Barbershop gets it."},
-      {id:uid(), name:"Liam S.", stars:5, text:"Hot towel shave is unreal. Booking the calendar was so easy too."}
+      {id:uid(), name:"Marco R.", stars:5, text:"Best fade I've had in this city. The chair experience alone is worth it.", date:fmtDateKey(new Date()), approved:true, source:"admin"},
+      {id:uid(), name:"Diego T.", stars:5, text:"Walked in stressed, walked out feeling like a new man. Ava Barbershop gets it.", date:fmtDateKey(new Date()), approved:true, source:"admin"},
+      {id:uid(), name:"Liam S.", stars:5, text:"Hot towel shave is unreal. Booking the calendar was so easy too.", date:fmtDateKey(new Date()), approved:true, source:"admin"}
     ],
     bookings:[],
     passwordHash:null
@@ -652,15 +678,24 @@ async function loadData(){
     if(error) throw error;
     if(data && data.value && Object.keys(data.value).length){
       const d = data.value;
-      return Object.assign(defaultData(), d, {
+      const merged = Object.assign(defaultData(), d, {
         meta: Object.assign(defaultData().meta, d.meta||{}),
         wordings: Object.assign(defaultData().wordings, d.wordings||{}),
         hours: Object.assign(defaultData().hours, d.hours||{})
       });
+      normalizeData(merged);
+      return merged;
     }
   }catch(e){ console.error("loadData failed", e); }
   const d = defaultData();
   await saveData(d);
+  return d;
+}
+/* Backfill fields on records saved before certain features existed, so older
+   shop data keeps working after an update (e.g. testimonials added before the
+   review-approval flow existed are treated as already-approved admin picks). */
+function normalizeData(d){
+  d.testimonials = (d.testimonials||[]).map(t=> Object.assign({ date: fmtDateKey(new Date()), approved:true, source:"admin" }, t));
   return d;
 }
 let saveTimer=null;
@@ -677,6 +712,17 @@ async function saveData(d){
   }
 }
 async function persist(){ return saveData(DATA); }
+/* Pull just one array fresh from the server before appending to it, so a
+   client submitting a review or booking is less likely to clobber someone
+   else's change made at the same time (the whole row is still one JSON
+   document, so this narrows — not eliminates — the race). */
+async function refreshArray(key){
+  try{
+    const { data, error } = await sb.from("shop_data").select("value").eq("id", DATA_ROW_ID).maybeSingle();
+    if(!error && data && data.value && Array.isArray(data.value[key])) DATA[key] = data.value[key];
+    if(key==="testimonials") normalizeData(DATA);
+  }catch(e){ /* fall back to in-memory DATA if this fails */ }
+}
 
 function loadMyBookings(){
   try{
@@ -778,12 +824,27 @@ function renderClient(){
   });
 
   // testimonials
-  $("#testiGrid").innerHTML = DATA.testimonials.map(t=>`
+  const approved = DATA.testimonials.filter(t=>t.approved!==false);
+  $("#testiGrid").innerHTML = approved.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")).slice(0,6).map(t=>`
     <div class="testi-card reveal in">
       <div class="stars">${"★".repeat(t.stars||5)}${"☆".repeat(5-(t.stars||5))}</div>
       <p>"${esc(t.text)}"</p>
       <div class="who">— ${esc(t.name)}</div>
-    </div>`).join("") || `<div class="empty-state">No reviews yet.</div>`;
+    </div>`).join("") || `<div class="empty-state">No reviews yet. Be the first to leave one!</div>`;
+  if(approved.length){
+    const avg = approved.reduce((s,t)=>s+(t.stars||5),0) / approved.length;
+    const rounded = Math.round(avg);
+    $("#ratingSummary").innerHTML = `
+      <div class="avg">${avg.toFixed(1)}</div>
+      <div>
+        <div class="stars">${"★".repeat(rounded)}${"☆".repeat(5-rounded)}</div>
+        <div class="count">Based on ${approved.length} review${approved.length===1?"":"s"}</div>
+      </div>
+      <a href="reviews.html" class="seeall">See All Reviews →</a>`;
+  } else {
+    $("#ratingSummary").innerHTML = `<a href="reviews.html" class="seeall">See All Reviews →</a>`;
+  }
+  initReviewForm();
 
   // hours
   const todayDow = DOW[new Date().getDay()];
@@ -831,6 +892,38 @@ function playReveal(){
   $all(".reveal").forEach(el=> el.classList.add("in"));
 }
 
+/* -------- Client review submission -------- */
+let selectedRating = 0;
+function initReviewForm(){
+  const wrap = $("#rvStars");
+  if(!wrap || wrap.dataset.wired) { paintStars(); return; }
+  wrap.dataset.wired = "1";
+  $all("span", wrap).forEach(s=>{
+    s.addEventListener("mouseenter", ()=> paintStars(+s.dataset.v));
+    s.addEventListener("mouseleave", ()=> paintStars());
+    s.addEventListener("click", ()=>{ selectedRating = +s.dataset.v; paintStars(); });
+  });
+  $("#rvSubmit").addEventListener("click", submitReview);
+}
+function paintStars(hoverVal){
+  const v = hoverVal || selectedRating;
+  $all("#rvStars span").forEach(s=> s.classList.toggle("on", +s.dataset.v <= v));
+}
+async function submitReview(){
+  const name = $("#rvName").value.trim();
+  const text = $("#rvText").value.trim();
+  if(!selectedRating){ toast("Please select a star rating.", "err"); return; }
+  if(!name || !text){ toast("Please add your name and a short review.", "err"); return; }
+  const btn = $("#rvSubmit"); btn.disabled = true;
+  await refreshArray("testimonials");
+  DATA.testimonials.push({ id:uid(), name, stars:selectedRating, text, date: fmtDateKey(new Date()), approved:false, source:"client" });
+  const ok = await persist();
+  btn.disabled = false;
+  if(!ok){ DATA.testimonials.pop(); return; }
+  toast("Thanks! Your review will appear once it's approved.", "ok");
+  $("#rvName").value=""; $("#rvText").value=""; selectedRating = 0; paintStars();
+}
+
 /* -------- Booking Calendar (client) -------- */
 let calDate = new Date(); calDate.setDate(1);
 let selectedDateKey = null;
@@ -841,26 +934,49 @@ function initCalendar(){
   $("#calNext").onclick = ()=>{ calDate.setMonth(calDate.getMonth()+1); renderCal(); };
   renderCal();
   $("#bkSubmit").onclick = submitBooking;
+  $("#bkService").addEventListener("change", ()=>{ selectedSlot = null; renderCal(); });
 }
 
 function bookingsForDate(dateKey){
   return DATA.bookings.filter(b=> b.date===dateKey && b.status!=="cancelled");
 }
-function slotsForDate(dateKey){
+/* Minutes-since-midnight [start,end) ranges every existing booking occupies
+   that day, so a new booking can't overlap one that runs long (e.g. a 50min
+   combo) even if it doesn't share the exact same start time. */
+function occupiedRanges(dateKey, excludeId){
+  return bookingsForDate(dateKey).filter(b=>b.id!==excludeId).map(b=>{
+    const [h,m] = b.time.split(":").map(Number);
+    const start = h*60+m;
+    const dur = b.duration || DATA.slotMinutes || 30; // older bookings saved before duration was tracked
+    return { start, end: start+dur };
+  });
+}
+function currentServiceDuration(){
+  const svc = DATA.services.find(s=>s.id===$("#bkService").value);
+  return svc ? svc.duration : (DATA.slotMinutes||30);
+}
+/* All valid start times for an appointment of `duration` minutes on a given
+   day — a start is only offered if the appointment would finish before
+   closing. */
+function slotsForDate(dateKey, duration){
   const d = parseDateKey(dateKey);
   const dow = DOW[d.getDay()];
   const h = DATA.hours[dow];
   if(!h || h.closed) return [];
+  duration = duration || DATA.slotMinutes || 30;
   const [oh,om] = h.open.split(":").map(Number);
   const [ch,cm] = h.close.split(":").map(Number);
   let cur = oh*60+om; const end = ch*60+cm; const step = DATA.slotMinutes||30;
   const out = [];
-  while(cur < end){
+  while(cur + duration <= end){
     const hh = Math.floor(cur/60), mm = cur%60;
     out.push(String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0"));
     cur += step;
   }
   return out;
+}
+function isRangeFree(ranges, startMin, duration){
+  return !ranges.some(r=> startMin < r.end && (startMin+duration) > r.start);
 }
 
 function renderCal(){
@@ -869,6 +985,7 @@ function renderCal(){
   const startDow = first.getDay();
   const daysInMonth = new Date(calDate.getFullYear(), calDate.getMonth()+1, 0).getDate();
   const today = new Date(); today.setHours(0,0,0,0);
+  const duration = currentServiceDuration();
   let html = ["S","M","T","W","T","F","S"].map(d=>`<div class="dow">${d}</div>`).join("");
   for(let i=0;i<startDow;i++) html += `<div class="cal-day empty"></div>`;
   for(let day=1; day<=daysInMonth; day++){
@@ -877,9 +994,16 @@ function renderCal(){
     const dow = DOW[d.getDay()];
     const isPast = d < today;
     const isClosed = DATA.hours[dow] && DATA.hours[dow].closed;
-    const allSlots = isClosed ? [] : slotsForDate(key);
     const taken = bookingsForDate(key).length;
-    const isFull = !isClosed && allSlots.length>0 && taken>=allSlots.length;
+    let isFull = false;
+    if(!isPast && !isClosed){
+      const ranges = occupiedRanges(key);
+      const anyFree = slotsForDate(key, duration).some(t=>{
+        const [th,tm] = t.split(":").map(Number);
+        return isRangeFree(ranges, th*60+tm, duration);
+      });
+      isFull = !anyFree;
+    }
     let cls = "cal-day";
     if(isPast) cls += " past";
     else if(isClosed) cls += " closed";
@@ -904,11 +1028,17 @@ function renderSlots(){
     $("#slotsWrap").innerHTML = "";
     return;
   }
-  const all = slotsForDate(selectedDateKey);
-  const takenTimes = new Set(bookingsForDate(selectedDateKey).map(b=>b.time));
-  $("#hoursNote").textContent = fmtDisplayDate(selectedDateKey) + " — " + (all.length - takenTimes.size) + " slot(s) available";
+  const duration = currentServiceDuration();
+  const all = slotsForDate(selectedDateKey, duration);
+  const ranges = occupiedRanges(selectedDateKey);
+  const availableCount = all.filter(t=>{
+    const [th,tm] = t.split(":").map(Number);
+    return isRangeFree(ranges, th*60+tm, duration);
+  }).length;
+  $("#hoursNote").textContent = fmtDisplayDate(selectedDateKey) + " — " + availableCount + " slot(s) available for this service";
   $("#slotsWrap").innerHTML = all.map(t=>{
-    const taken = takenTimes.has(t);
+    const [th,tm] = t.split(":").map(Number);
+    const taken = !isRangeFree(ranges, th*60+tm, duration);
     return `<div class="slot ${taken?'taken':''} ${t===selectedSlot?'sel':''}" data-t="${t}">${fmtTime12(t)}</div>`;
   }).join("");
   $all(".slot").forEach(el=>{
@@ -926,9 +1056,19 @@ async function submitBooking(){
   if(!selectedDateKey){ toast("Please select a date.", "err"); return; }
   if(!selectedSlot){ toast("Please select a time slot.", "err"); return; }
   const svc = DATA.services.find(s=>s.id===svcId);
+  const duration = svc ? svc.duration : (DATA.slotMinutes||30);
   const btn = $("#bkSubmit"); btn.disabled = true;
+  await refreshArray("bookings");
+  const [sh,sm] = selectedSlot.split(":").map(Number);
+  const startMin = sh*60+sm;
+  if(!isRangeFree(occupiedRanges(selectedDateKey), startMin, duration)){
+    btn.disabled = false;
+    toast("Sorry, that slot was just taken. Please pick another.", "err");
+    selectedSlot = null; renderCal();
+    return;
+  }
   const booking = { id: uid(), name, phone, serviceId: svcId, serviceName: svc?svc.name:"Service", price: svc?svc.price:0,
-    date: selectedDateKey, time: selectedSlot, notes, status:"pending", createdAt: Date.now() };
+    duration, date: selectedDateKey, time: selectedSlot, notes, status:"pending", createdAt: Date.now() };
   DATA.bookings.push(booking);
   const ok = await persist();
   btn.disabled = false;
@@ -939,7 +1079,7 @@ async function submitBooking(){
   toast("Booking request sent! We'll confirm shortly.", "ok");
   $("#bkName").value=""; $("#bkPhone").value=""; $("#bkNotes").value="";
   selectedSlot = null;
-  renderSlots(); renderCal(); renderMyBookings();
+  renderCal(); renderMyBookings();
 }
 
 async function renderMyBookings(){
