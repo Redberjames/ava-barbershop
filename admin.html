@@ -343,6 +343,7 @@ function defaultData(){
     },
     slotMinutes:30,
     bookingMode:"manual",
+    cancellationNoticeHours:2,
     gallery:[
       {id:uid(), url:"https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=900&auto=format&fit=crop", caption:"Skin fade, freshly cleaned up"},
       {id:uid(), url:"https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=900&auto=format&fit=crop", caption:"Hot towel shave ritual"},
@@ -390,6 +391,7 @@ async function loadData(){
 function normalizeData(d){
   d.testimonials = (d.testimonials||[]).map(t=> Object.assign({ date: fmtDateKey(new Date()), approved:true, source:"admin" }, t));
   d.bookingMode = d.bookingMode === "auto" ? "auto" : "manual";
+  d.cancellationNoticeHours = Number.isFinite(+d.cancellationNoticeHours) ? Math.max(0, +d.cancellationNoticeHours) : 2;
   return d;
 }
 let saveTimer=null;
@@ -873,6 +875,26 @@ function pageSettings(){
       <button class="btn btn-solid btn-sm" id="saveBookingMode" style="margin-top:14px;"><span>Save Booking Setting</span></button>
     </div>
     <div class="card">
+      <h3>Cancellation Policy</h3>
+      <div class="admin-form">
+        <div class="field" style="max-width:340px;">
+          <label for="cancelNotice">Clients can cancel online up until</label>
+          <select id="cancelNotice">
+            <option value="0" ${DATA.cancellationNoticeHours===0?'selected':''}>Anytime before the appointment</option>
+            <option value="1" ${DATA.cancellationNoticeHours===1?'selected':''}>1 hour before</option>
+            <option value="2" ${DATA.cancellationNoticeHours===2?'selected':''}>2 hours before</option>
+            <option value="4" ${DATA.cancellationNoticeHours===4?'selected':''}>4 hours before</option>
+            <option value="6" ${DATA.cancellationNoticeHours===6?'selected':''}>6 hours before</option>
+            <option value="12" ${DATA.cancellationNoticeHours===12?'selected':''}>12 hours before</option>
+            <option value="24" ${DATA.cancellationNoticeHours===24?'selected':''}>24 hours before</option>
+            <option value="48" ${DATA.cancellationNoticeHours===48?'selected':''}>48 hours before</option>
+          </select>
+        </div>
+      </div>
+      <div class="helptext" style="margin-top:10px;">Once this window closes, clients see "Cancellation Unavailable" and are told to contact the shop directly.</div>
+      <button class="btn btn-solid btn-sm" id="saveCancelNotice" style="margin-top:14px;"><span>Save Cancellation Setting</span></button>
+    </div>
+    <div class="card">
       <h3>Accent Color</h3>
       <div class="swatches">
         ${["#c9a24c","#d4af37","#b76e79","#8fa998","#7a8ec2","#c15f45"].map(c=>`<div class="swatch ${c===DATA.meta.accent?'sel':''}" style="background:${c}" data-color="${c}"></div>`).join("")}
@@ -1055,6 +1077,13 @@ function wireAdminPage(page){
       DATA.bookingMode = mode;
       if(await persist()){ toast(mode === "auto" ? "Auto accept enabled." : "Manual approval enabled.", "ok"); }
       else DATA.bookingMode = prev;
+    };
+    $("#saveCancelNotice").onclick = async ()=>{
+      const hours = Math.max(0, +$("#cancelNotice").value || 0);
+      const prev = DATA.cancellationNoticeHours;
+      DATA.cancellationNoticeHours = hours;
+      if(await persist()){ toast(hours===0 ? "Clients can now cancel anytime before their appointment." : `Clients can now cancel up to ${hours} hour(s) before their appointment.`, "ok"); }
+      else DATA.cancellationNoticeHours = prev;
     };
     $all(".swatch").forEach(sw=> sw.addEventListener("click", async ()=>{
       DATA.meta.accent = sw.dataset.color;
