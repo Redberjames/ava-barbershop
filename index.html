@@ -1450,7 +1450,27 @@ function openBookingModal(b){
 function closeBookingModal(){ const m=$('#bookingModal'); if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true');} }
 async function downloadBookingReceipt(b){
   if(!b || b.status!=='confirmed'){ toast('The appointment must be confirmed before downloading its confirmation.','err'); return; }
-  const logo=$('#receiptLogo'); logo.src=$('.hero-art .logo-3d')?.src || '';
+  const logo=$('#receiptLogo');
+  // Load the logo as an actual data: URI rather than pointing at the live file.
+  // html2canvas treats network-loaded images as cross-origin resources and can
+  // silently produce a "tainted" canvas (toBlob returns null) even for same-site
+  // images — embedding the bytes directly sidesteps that entirely.
+  try{
+    const heroLogo = $('.hero-art .logo-3d');
+    const src = heroLogo ? (heroLogo.currentSrc || heroLogo.src) : '';
+    if(src){
+      const resp = await fetch(src);
+      const blob = await resp.blob();
+      logo.src = await new Promise((resolve, reject)=>{
+        const reader = new FileReader();
+        reader.onload = ()=> resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } else {
+      logo.src = '';
+    }
+  }catch(_){ logo.src = ''; }
   $('#receiptShopName').textContent=DATA.meta.name||'Ava Barbershop';
   $('#receiptRef').textContent=bookingRef(b);
   $('#receiptClient').innerHTML=`${esc(b.name)}<br>${esc(b.phone)}`;
@@ -1492,7 +1512,7 @@ async function downloadBookingReceipt(b){
       w.document.write('<html><head><title>Appointment Confirmation</title><style>body{margin:0;background:#11100d;color:#f4efe4;font-family:Arial,sans-serif}*{box-sizing:border-box}</style></head><body>'+sheet.outerHTML+'</body></html>'); w.document.close(); w.focus(); setTimeout(()=>w.print(),500);
     }
     toast('Your appointment confirmation is ready.','ok');
-  }catch(e){ console.error(e); toast('We could not create your confirmation: '+(e && e.message ? e.message : 'Unknown error'),'err'); }
+  }catch(e){ console.error(e); toast('We could not create your confirmation. Please try again.','err'); }
   finally{ Object.assign(sheet.style,previous); }
 }
 function openPhoneVerify(b){
