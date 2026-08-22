@@ -1224,12 +1224,21 @@ function bookingsForDate(dateKey){
    that day, so a new booking can't overlap one that runs long (e.g. a 50min
    combo) even if it doesn't share the exact same start time. */
 function occupiedRanges(dateKey, excludeId){
-  return bookingsForDate(dateKey).filter(b=>b.id!==excludeId).map(b=>{
+  const ranges = bookingsForDate(dateKey).filter(b=>b.id!==excludeId).map(b=>{
     const [h,m] = b.time.split(":").map(Number);
     const start = h*60+m;
     const dur = b.duration || DATA.slotMinutes || 30; // older bookings saved before duration was tracked
     return { start, end: start+dur };
   });
+  const d = parseDateKey(dateKey);
+  const dow = DOW[d.getDay()];
+  const h = DATA.hours[dow];
+  if(h && h.lunchEnabled && h.lunchStart && h.lunchEnd){
+    const [lh,lm] = h.lunchStart.split(":").map(Number);
+    const [eh,em] = h.lunchEnd.split(":").map(Number);
+    ranges.push({ start: lh*60+lm, end: eh*60+em });
+  }
+  return ranges;
 }
 function currentServiceDuration(){
   const svc = DATA.services.find(s=>s.id===$("#bkService").value);
