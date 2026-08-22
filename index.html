@@ -491,7 +491,7 @@ img{max-width:100%; display:block;}
 .receipt-sheet .rs-value{font-size:13px;line-height:1.5}
 .receipt-sheet .rs-footer{text-align:center;color:#888;font-size:9px;line-height:1.6;margin-top:24px}
 .receipt-sheet .rs-qr{margin:18px auto 0;width:120px;height:120px;border:1px solid rgba(255,255,255,.1);padding:5px}
-.receipt-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.receipt-actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:14px}
 .receipt-close-row{text-align:center;margin-top:10px}
 .receipt-close-row button{background:none;border:none;color:var(--ink-faint);font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;padding:6px}
 .receipt-close-row button:hover{color:var(--ink)}
@@ -814,8 +814,7 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
       <div class="rs-footer">Please arrive 5–10 minutes early.<br>Keep this confirmation for your records.</div>
     </div>
     <div class="receipt-actions">
-      <button class="btn" id="receiptPrint">Print</button>
-      <button class="btn btn-solid" id="receiptSave"><span>Save as PDF</span></button>
+      <button class="btn btn-solid" id="receiptPrint"><span>Save/Print</span></button>
     </div>
     <div class="receipt-close-row"><button id="receiptClose" type="button">Close</button></div>
   </div>
@@ -828,7 +827,6 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 /* ==========================================================================================
    AVA BARBERSHOP — single-file app. Client site + password-protected Admin CMS.
@@ -1334,7 +1332,6 @@ function initCalendar(){
   $("#bookingModalCancel").addEventListener("click", async e=>{ const b=DATA.bookings.find(x=>x.id===e.currentTarget.dataset.bookingId); if(b) await cancelBooking(b); });
   $("#myBookingsWrap").addEventListener("click", async e=>{ const r=e.target.closest('[data-receipt]'); if(r){const b=DATA.bookings.find(x=>x.id===r.dataset.receipt); if(b) await downloadBookingReceipt(b); return;} const m=e.target.closest('[data-manage]'); if(m){const b=DATA.bookings.find(x=>x.id===m.dataset.manage); if(b) openBookingModal(b);} });
   $("#receiptPrint").addEventListener("click", printReceipt);
-  $("#receiptSave").addEventListener("click", saveReceiptPdf);
   $("#receiptClose").addEventListener("click", ()=> closeOverlay($("#receiptModal")));
   $("#receiptModal").addEventListener("click", e=>{ if(e.target.id==="receiptModal") closeOverlay($("#receiptModal")); });
 }
@@ -1562,30 +1559,10 @@ async function downloadBookingReceipt(b){
   openOverlay($('#receiptModal'));
 }
 function printReceipt(){
+  // Single action for both printing and saving — the browser's print dialog
+  // lets the client choose a printer or "Save as PDF" as the destination.
   if(!$('#receiptModal')?.classList.contains('show')) return;
   window.print();
-}
-async function saveReceiptPdf(){
-  const b = currentReceiptBooking;
-  const sheet = $('#receiptSheet');
-  if(!sheet) return;
-  try{
-    if(window.html2pdf){
-      await window.html2pdf().set({
-        margin:0.18,
-        filename:`${b?bookingRef(b):'appointment'}-appointment-confirmation.pdf`,
-        image:{type:'jpeg',quality:.96},
-        html2canvas:{scale:2,useCORS:true,backgroundColor:'#11100d',logging:false},
-        jsPDF:{unit:'in',format:[4.1,6.7],orientation:'portrait'}
-      }).from(sheet).save();
-      toast('Your appointment confirmation is ready.','ok');
-    } else {
-      // No PDF library available (e.g. offline) — printing to PDF is a reliable fallback
-      // available in every browser's print dialog.
-      toast('Opening the print dialog — choose "Save as PDF" as the destination.','info');
-      window.print();
-    }
-  }catch(e){ console.error(e); toast('We could not create the PDF. Try Print instead and save as PDF from there.','err'); }
 }
 function openPhoneVerify(b){
   return new Promise(resolve=>{
