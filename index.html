@@ -1206,6 +1206,14 @@ async function submitBooking(){
   const svc = DATA.services.find(s=>s.id===svcId);
   const duration = svc ? svc.duration : (DATA.slotMinutes||30);
   const btn = $("#bkSubmit"); btn.disabled = true;
+  /* Re-read the shared shop configuration immediately before submit so a
+     visitor never books using a stale manual/auto setting from an old tab. */
+  try{
+    const {data: liveRow, error: liveErr} = await sb.from("shop_data").select("value").eq("id", DATA_ROW_ID).maybeSingle();
+    if(!liveErr && liveRow && liveRow.value){
+      DATA.bookingMode = liveRow.value.bookingMode === "auto" ? "auto" : "manual";
+    }
+  }catch(e){ console.warn("Could not refresh booking mode before submit", e); }
   await refreshArray("bookings");
   const [sh,sm] = selectedSlot.split(":").map(Number);
   const startMin = sh*60+sm;
@@ -1215,8 +1223,8 @@ async function submitBooking(){
     selectedSlot = null; renderCal();
     return;
   }
-  /* Calls a narrow database function instead of writing shop_data directly —
-     visitors can only ever append a well-formed, pending booking this way. */
+  /* Manual mode uses the existing pending-booking RPC. Auto mode uses the
+     secure auto RPC, which must confirm only the booking created by this call. */
   const rpcName = DATA.bookingMode === "auto" ? "submit_booking_auto" : "submit_booking";
   const { data: booking, error } = await sb.rpc(rpcName, {
     p_name: name, p_phone: phone, p_service_id: svcId,

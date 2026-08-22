@@ -737,7 +737,7 @@ function renderAdminBookList(){
       <div class="main"><b>${fmtTime12(b.time)} · ${esc(b.name)}</b><div class="m2">${esc(b.serviceName)} · ₱${b.price} · 📞 ${esc(b.phone)}${b.notes?(' · '+esc(b.notes)):''}</div></div>
       <div class="acts">
         <span class="pill ${b.status}">${b.status}</span>
-        ${b.status!=="confirmed" ? `<button class="icon-btn" data-conf="${b.id}" title="Confirm">✓</button>`:""}
+        ${DATA.bookingMode !== "auto" && b.status==="pending" ? `<button class="icon-btn" data-conf="${b.id}" title="Confirm">✓</button>`:""}
         ${b.status!=="cancelled" ? `<button class="icon-btn del" data-canc="${b.id}" title="Cancel">✕</button>`:""}
         <button class="icon-btn del" data-delbk="${b.id}" title="Delete">🗑</button>
       </div>
@@ -849,7 +849,7 @@ function pageSettings(){
           </select>
         </div>
       </div>
-      <div class="helptext" style="margin-top:10px;">Auto accept works with the overlap-safe booking RPC. Cancelled bookings still release their time slot.</div>
+      <div class="helptext" style="margin-top:10px;">${auto ? "Auto accept is ON. New valid bookings are confirmed immediately, so the manual Confirm action is disabled." : "Manual approval is ON. New bookings stay Pending until you confirm or cancel them."} Cancelled bookings still release their time slot.</div>
       <button class="btn btn-solid btn-sm" id="saveBookingMode" style="margin-top:14px;"><span>Save Booking Setting</span></button>
     </div>
     <div class="card">
@@ -946,7 +946,11 @@ function wireAdminPage(page){
     renderAdminCalendar();
     $("#admBookList").addEventListener("click", async e=>{
       const c = e.target.closest("[data-conf]"), x = e.target.closest("[data-canc]"), del = e.target.closest("[data-delbk]");
-      if(c){ DATA.bookings.find(b=>b.id===c.dataset.conf).status="confirmed"; }
+      if(c){
+        if(DATA.bookingMode === "auto"){ toast("Manual approval is disabled while Auto accept is enabled.","err"); return; }
+        const booking = DATA.bookings.find(b=>b.id===c.dataset.conf);
+        if(booking && booking.status === "pending") booking.status="confirmed";
+      }
       if(x){ DATA.bookings.find(b=>b.id===x.dataset.canc).status="cancelled"; }
       if(del){ DATA.bookings = DATA.bookings.filter(b=>b.id!==del.dataset.delbk); }
       if(c||x||del){ if(await persist()){ renderAdminCalendar(); toast("Updated.","ok"); } }
