@@ -386,6 +386,52 @@ img{max-width:100%; display:block;}
   .hero-stats{ margin-top:18px; }
 }
 
+
+/* ================= PREMIUM CLIENT UX ================= */
+.review-topline{display:grid;grid-template-columns:1fr auto;align-items:center;gap:24px;margin:4px 0 30px;padding:18px 0;border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft)}
+.review-topline .rating-summary{margin:0;gap:18px}
+.review-directory{display:inline-flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--premium-border);border-radius:999px;color:var(--ink-dim);font-size:11px;letter-spacing:.12em;text-transform:uppercase;transition:all .25s var(--ease);white-space:nowrap}
+.review-directory strong{font-size:18px;font-weight:400;color:var(--accent);transition:transform .25s var(--ease)}
+.review-directory:hover{color:var(--ink);border-color:rgba(238,203,122,.42);background:rgba(201,162,76,.06);transform:translateY(-1px)}
+.review-directory:hover strong{transform:translateX(3px)}
+.review-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,.75fr);gap:28px;align-items:start}
+.review-grid .testi-grid{min-width:0}
+.review-form{margin-top:0;max-width:none;position:sticky;top:92px;background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.012)),var(--panel);box-shadow:0 20px 60px rgba(0,0,0,.18)}
+.review-form::before{content:'';display:block;width:38px;height:2px;background:linear-gradient(90deg,var(--accent),transparent);margin-bottom:18px}
+.review-form-note{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:10.5px;color:var(--ink-faint);line-height:1.5}
+.note-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px rgba(201,162,76,.5);flex:0 0 auto}
+.testi-card{position:relative;overflow:hidden}
+.testi-card::after{content:'“';position:absolute;right:20px;top:8px;font-family:'Cormorant Garamond';font-size:72px;line-height:1;color:rgba(238,203,122,.07);pointer-events:none}
+@media(max-width:980px){.review-grid{grid-template-columns:1fr}.review-form{position:relative;top:auto}.review-topline{grid-template-columns:1fr auto}}
+@media(max-width:640px){.review-topline{grid-template-columns:1fr;gap:14px;padding:16px 0;margin-bottom:22px}.review-directory{justify-content:space-between}.review-grid{gap:18px}.review-form{padding:20px}.testi-card{padding:24px}}
+
+/* ================= PREMIUM V2 UX POLISH ================= */
+:root{--premium-border:rgba(238,203,122,.18);--premium-glow:rgba(201,162,76,.12);--premium-surface:rgba(255,255,255,.025)}
+body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),transparent 38%)}
+.btn{transition:transform .28s var(--ease),box-shadow .28s var(--ease),background .28s var(--ease),border-color .28s var(--ease)}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(0) scale(.985)}
+.btn:focus-visible,a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold-2);outline-offset:3px}
+.svc-card,.announce-card,.testi-card{transition:transform .35s var(--ease),box-shadow .35s var(--ease),border-color .35s var(--ease)}
+.svc-card:hover,.announce-card:hover,.testi-card:hover{box-shadow:0 18px 45px rgba(0,0,0,.32),0 0 0 1px var(--premium-border);border-color:var(--premium-border)}
+.field input,.field select,.field textarea{transition:border-color .25s var(--ease),box-shadow .25s var(--ease),background .25s var(--ease)}
+.field input:focus,.field select:focus,.field textarea:focus{background:rgba(255,255,255,.035);box-shadow:0 0 0 4px var(--premium-glow)}
+/* Booking progress */
+.booking-progress{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 28px}
+.booking-step{position:relative;padding:12px 10px;border:1px solid var(--line-soft);background:var(--premium-surface);text-align:center;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);transition:.3s var(--ease)}
+.booking-step:first-child{border-radius:10px 0 0 10px}.booking-step:last-child{border-radius:0 10px 10px 0}
+.booking-step .num{display:block;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.04em;margin-bottom:2px}
+.booking-step.active{color:var(--ink);border-color:rgba(238,203,122,.45);background:rgba(201,162,76,.08);box-shadow:inset 0 -2px 0 var(--gold)}
+.booking-step.done{color:var(--gold-2)}
+.booking-step.done .num::after{content:' ✓';font-family:Jost,sans-serif;font-size:11px}
+/* Floating mobile booking CTA */
+.mobile-book-cta{display:none;position:fixed;z-index:80;left:14px;right:14px;bottom:14px;padding:13px 18px;border:1px solid rgba(238,203,122,.5);border-radius:14px;background:rgba(16,14,10,.94);backdrop-filter:blur(16px);box-shadow:0 16px 40px rgba(0,0,0,.45),0 0 0 1px rgba(201,162,76,.08);text-align:center;font-size:12px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--gold-2)}
+.mobile-book-cta.show{display:block;animation:premiumUp .4s var(--ease)}
+@keyframes premiumUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:640px){.booking-progress{gap:4px;margin-bottom:20px}.booking-step{padding:9px 4px;font-size:8px}.booking-step .num{font-size:16px}.mobile-book-cta{display:block}.mobile-book-cta.show{display:block}body{padding-bottom:64px}}
+@media(min-width:641px){.mobile-book-cta{display:none!important}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn,.svc-card,.announce-card,.testi-card{transition:none!important}.reveal{transition:none!important}.mobile-book-cta{animation:none!important}}
+
 </style>
 </head>
 <body>
@@ -517,9 +563,15 @@ img{max-width:100%; display:block;}
         <div class="eyebrow">Word On The Street</div>
         <h2 class="section-title">Client <em>Love</em></h2>
       </div>
-      <div class="rating-summary reveal" id="ratingSummary"></div>
-      <div class="testi-grid" id="testiGrid"></div>
-      <div class="review-form reveal">
+      <div class="review-topline reveal">
+        <div class="rating-summary" id="ratingSummary" aria-live="polite"></div>
+        <a href="reviews.html" class="review-directory" aria-label="View all client reviews">
+          <span>Browse all reviews</span><strong>→</strong>
+        </a>
+      </div>
+      <div class="review-grid">
+        <div class="testi-grid" id="testiGrid"></div>
+        <div class="review-form reveal">
         <h3>Rate Your Visit</h3>
         <div class="helptext">Reviews are checked by the shop before they go live.</div>
         <div class="field" style="margin-top:18px;"><label>Your Rating</label><div class="star-input" id="rvStars"><span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span></div></div>
@@ -527,12 +579,21 @@ img{max-width:100%; display:block;}
           <div class="field"><label>Your Name</label><input id="rvName" placeholder="Juan Dela Cruz"></div>
         </div>
         <div class="field" style="margin-top:16px;"><label>Your Review</label><textarea id="rvText" rows="3" placeholder="Tell us about your visit..."></textarea></div>
-        <button class="btn btn-solid" id="rvSubmit" style="margin-top:18px;"><span>Submit Review</span></button>
+          <button class="btn btn-solid" id="rvSubmit" style="margin-top:18px;"><span>Submit Review</span></button>
+          <div class="review-form-note"><span class="note-dot"></span> Your review is moderated before publishing.</div>
+        </div>
       </div>
     </div>
   </section>
 
   <section id="book" class="section">
+    <div class="container" aria-label="Booking progress"><div class="booking-progress" id="bookingProgress">
+      <div class="booking-step active" data-step="1"><span class="num">01</span>Service</div>
+      <div class="booking-step" data-step="2"><span class="num">02</span>Date</div>
+      <div class="booking-step" data-step="3"><span class="num">03</span>Time</div>
+      <div class="booking-step" data-step="4"><span class="num">04</span>Confirm</div>
+    </div></div>
+
     <div class="container">
       <div class="section-head reveal">
         <div class="eyebrow">Reserve Your Chair</div>
@@ -918,10 +979,9 @@ function renderClient(){
       <div>
         <div class="stars">${"★".repeat(rounded)}${"☆".repeat(5-rounded)}</div>
         <div class="count">Based on ${approved.length} review${approved.length===1?"":"s"}</div>
-      </div>
-      <a href="reviews.html" class="seeall">See All Reviews →</a>`;
+      </div>`;
   } else {
-    $("#ratingSummary").innerHTML = `<a href="reviews.html" class="seeall">See All Reviews →</a>`;
+    $("#ratingSummary").innerHTML = `<div class="count">No reviews yet</div>`;
   }
   initReviewForm();
 
@@ -1123,8 +1183,9 @@ function renderSlots(){
   }).join("");
   $all(".slot").forEach(el=>{
     if(el.classList.contains("taken")) return;
-    el.addEventListener("click", ()=>{ selectedSlot = el.dataset.t; renderSlots(); });
+    el.addEventListener("click", ()=>{ selectedSlot = el.dataset.t; renderSlots(); updateBookingProgress(); });
   });
+  updateBookingProgress();
 }
 
 async function submitBooking(){
@@ -1212,21 +1273,12 @@ function initChrome(){
   if(heroArt){
     document.addEventListener("mousemove", (e)=>{
       const w = window.innerWidth, h = window.innerHeight;
-      const rx = ((e.clientY / h) - .5) * -14;
-      const ry = ((e.clientX / w) - .5) * 18;
+      const rx = ((e.clientY / h) - .5) * -5;
+      const ry = ((e.clientX / w) - .5) * 7;
       heroArt.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
     });
   }
-  document.addEventListener("mousemove", (e)=>{
-    $all(".svc-card, .announce-card, .testi-card").forEach(card=>{
-      const r = card.getBoundingClientRect();
-      if(e.clientX < r.left-40 || e.clientX > r.right+40 || e.clientY < r.top-40 || e.clientY > r.bottom+40) return;
-      const cx = r.left + r.width/2, cy = r.top + r.height/2;
-      const rx = ((e.clientY - cy)/r.height) * -8;
-      const ry = ((e.clientX - cx)/r.width) * 8;
-      card.style.transform = `perspective(700px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(6px)`;
-    });
-  });
+  // Keep content cards visually calm; the premium feel comes from spacing, light and motion restraint.
   $all("section").forEach(sec=>{
     sec.addEventListener("mouseleave", ()=>{
       $all(".svc-card, .announce-card, .testi-card", sec).forEach(c=> c.style.transform = "");
@@ -1253,17 +1305,36 @@ function initChrome(){
 /* ==========================================================================================
    BOOT
    ========================================================================================== */
+
+/* Premium V2 booking UX */
+function updateBookingProgress(){
+  const steps=$all('#bookingProgress .booking-step'); if(!steps.length)return;
+  const service=!!$('#bkService')?.value, date=!!selectedDateKey, time=!!selectedSlot;
+  let active=service?2:1; if(date)active=3; if(time)active=4;
+  steps.forEach((el,i)=>{const n=i+1;el.classList.toggle('active',n===active);el.classList.toggle('done',n<active);});
+}
+function initPremiumUX(){
+  const svc=$('#bkService'); if(svc) svc.addEventListener('change',updateBookingProgress);
+  const name=$('#bkName'), phone=$('#bkPhone');
+  [name,phone].forEach(el=>el&&el.addEventListener('input',updateBookingProgress));
+  updateBookingProgress();
+  const cta=$('#mobileBookCta');
+  if(cta) window.addEventListener('scroll',()=>cta.classList.toggle('show',window.scrollY>520 && window.scrollY < Math.max(600,document.body.scrollHeight-window.innerHeight-300)),{passive:true});
+}
+
 async function boot(){
   DATA = await loadData();
   $("#clientApp").classList.remove("hidden");
   applyTheme();
   renderClient();
   initChrome();
+  initPremiumUX();
   $("#loader").classList.add("out");
 }
 boot();
 
 })();
 </script>
+<a class="mobile-book-cta" id="mobileBookCta" href="#book" aria-label="Book an appointment">Book Your Chair</a>
 </body>
 </html>
