@@ -302,31 +302,61 @@ img{max-width:100%; display:block;}
 
 /* ============================= BOOKING ============================= */
 .book-wrap{ display:grid; grid-template-columns:.95fr 1.05fr; gap:40px; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-lg); padding:32px; }
-.cal{ max-width:340px; margin:0 auto; }
-.cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-.cal-head .m{ font-family:'Bebas Neue'; font-size:20px; letter-spacing:.06em; }
+.cal{ max-width:360px; margin:0 auto; background:linear-gradient(165deg,rgba(255,255,255,.035),rgba(255,255,255,0) 55%),var(--panel); border:1px solid var(--line); border-radius:16px; padding:22px 20px 24px; box-shadow:0 20px 50px -24px rgba(0,0,0,.6); }
+.cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+.cal-head .m{ font-family:'Bebas Neue'; font-size:22px; letter-spacing:.07em; color:var(--ink); }
 .cal-nav{ display:flex; gap:8px; }
-.cal-nav button{ width:28px; height:28px; border:1px solid var(--line); background:transparent; color:var(--ink-dim); border-radius:6px; }
-.cal-nav button:hover{ color:var(--accent); border-color:var(--accent); }
-.cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:4px; text-align:center; }
-.cal-grid .dow{ font-size:9.5px; letter-spacing:.1em; color:var(--ink-faint); padding-bottom:4px; text-transform:uppercase;}
-.cal-day{ aspect-ratio:1; max-height:42px; display:flex; align-items:center; justify-content:center; border-radius:8px; font-size:12px; color:var(--ink-dim); cursor:pointer; position:relative; border:1px solid transparent; }
+.cal-nav button{ width:32px; height:32px; border:1px solid var(--line); background:rgba(255,255,255,.02); color:var(--ink-dim); border-radius:50%; font-size:14px; line-height:1; cursor:pointer; transition:color .22s,border-color .22s,background .22s,transform .18s; }
+.cal-nav button:hover{ color:#100e0a; border-color:var(--gold); background:var(--gold); transform:translateY(-1px); }
+.cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:6px 4px; text-align:center; }
+.cal-grid .dow{ font-size:9.5px; letter-spacing:.14em; color:var(--gold-dim); padding-bottom:8px; text-transform:uppercase; font-weight:600;}
+.cal-day{ aspect-ratio:1; max-height:42px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:12.5px; color:var(--ink-dim); cursor:pointer; position:relative; border:1px solid transparent; transition:background .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease),transform .15s var(--ease),box-shadow .2s var(--ease); }
 .cal-day.empty{ visibility:hidden; }
-.cal-day.past{ color:var(--ink-faint); opacity:.3; cursor:not-allowed; }
-.cal-day.closed{ color:var(--ink-faint); opacity:.4; cursor:not-allowed; text-decoration:line-through; }
-.cal-day:not(.past):not(.closed):not(.empty):hover{ border-color:var(--line); background:var(--bg-2); }
-.cal-day.sel{ background:var(--accent); color:#100e0a; font-weight:600; }
-.cal-day.full{ opacity:.35; text-decoration:line-through; cursor:not-allowed; }
-.cal-day .d{ position:absolute; bottom:4px; width:4px; height:4px; border-radius:50%; background:var(--accent); }
-.slots{ display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
-.slot{ padding:8px 14px; border:1px solid var(--line); border-radius:6px; font-size:12.5px; color:var(--ink-dim); }
-.slot:hover{ border-color:var(--accent); color:var(--accent); }
-.slot.sel{ background:var(--accent); border-color:var(--accent); color:#100e0a; font-weight:600; }
+.cal-day.past{ color:var(--ink-faint); opacity:.28; cursor:not-allowed; }
+.cal-day.closed{ color:var(--ink-faint); opacity:.35; cursor:not-allowed; text-decoration:line-through; }
+.cal-day.today{ color:var(--gold-2); box-shadow:inset 0 0 0 1px rgba(238,203,122,.5); font-weight:700; }
+.cal-day:not(.past):not(.closed):not(.empty):not(.full):hover{ border-color:rgba(238,203,122,.5); background:rgba(201,162,76,.1); color:var(--ink); transform:translateY(-1px); }
+.cal-day.sel{ background:linear-gradient(160deg,var(--gold-2),var(--gold)); color:#100e0a; font-weight:700; box-shadow:0 8px 20px -6px rgba(201,162,76,.6); transform:translateY(-1px); }
+.cal-day.sel.today{ box-shadow:0 8px 20px -6px rgba(201,162,76,.6); }
+.cal-day.full{ opacity:.32; text-decoration:line-through; cursor:not-allowed; }
+.cal-day .d{ position:absolute; bottom:5px; width:4px; height:4px; border-radius:50%; background:var(--gold-2); box-shadow:0 0 6px rgba(238,203,122,.7); }
+.cal-day.sel .d{ background:#100e0a; box-shadow:none; }
+.cal-legend{ display:flex; flex-wrap:wrap; gap:14px; margin-top:16px; padding-top:14px; border-top:1px solid var(--line-soft); }
+.cal-legend span{ display:inline-flex; align-items:center; gap:6px; font-size:10px; letter-spacing:.06em; color:var(--ink-faint); text-transform:uppercase; }
+.cal-legend i{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+.cal-legend .lg-open i{ background:transparent; border:1px solid var(--line); }
+.cal-legend .lg-booked i{ background:transparent; border:1px solid rgba(238,203,122,.5); box-shadow:inset 0 0 0 1px transparent; position:relative; }
+.cal-legend .lg-booked i::after{ content:''; position:absolute; inset:2px; border-radius:50%; background:var(--gold-2); }
+.cal-legend .lg-full i{ background:var(--ink-faint); opacity:.5; }
+.cal-legend .lg-sel i{ background:linear-gradient(160deg,var(--gold-2),var(--gold)); }
+.slots{ display:flex; flex-wrap:wrap; gap:9px; margin-top:18px; }
+.slot{ padding:9px 16px; border:1px solid var(--line); border-radius:30px; font-size:12.5px; color:var(--ink-dim); cursor:pointer; transition:border-color .2s,color .2s,background .2s,transform .15s,box-shadow .2s; }
+.slot:not(.taken):hover{ border-color:var(--accent); color:var(--ink); background:rgba(201,162,76,.1); transform:translateY(-1px); }
+.slot.sel{ background:linear-gradient(160deg,var(--gold-2),var(--gold)); border-color:var(--gold); color:#100e0a; font-weight:600; box-shadow:0 8px 18px -8px rgba(201,162,76,.6); }
 .slot.taken{ opacity:.3; text-decoration:line-through; cursor:not-allowed; }
 .form-grid{ display:grid; gap:16px; margin-top:18px; }
 .field label{ display:block; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:8px; }
 .field input, .field select, .field textarea{ width:100%; background:var(--bg-2); border:1px solid var(--line); color:var(--ink); padding:13px 14px; border-radius:6px; font-size:14px; outline:none; transition:border-color .25s; }
 .field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--accent); }
+
+/* Custom premium dropdown — replaces native <select> rendering (which falls back to a
+   mismatched, washed-out OS popup) with a themed widget that matches the rest of the site. */
+.custom-select{ position:relative; }
+.custom-select select.native-select-hidden{ position:absolute; inset:0; width:100%; height:100%; opacity:0; pointer-events:none; }
+.custom-select .cs-trigger{ width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--bg-2); border:1px solid var(--line); color:var(--ink); padding:13px 14px; border-radius:6px; font-size:14px; font-family:inherit; text-align:left; cursor:pointer; transition:border-color .25s, box-shadow .25s, background .25s; }
+.custom-select .cs-trigger:hover{ border-color:var(--gold-dim); }
+.custom-select.open .cs-trigger, .custom-select .cs-trigger:focus-visible{ border-color:var(--accent); background:rgba(255,255,255,.035); box-shadow:0 0 0 4px var(--premium-glow,rgba(201,162,76,.12)); outline:none; }
+.custom-select .cs-value{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.custom-select .cs-value.placeholder{ color:var(--ink-faint); }
+.custom-select .cs-chevron{ flex:none; color:var(--gold); font-size:10px; transition:transform .25s var(--ease); }
+.custom-select.open .cs-chevron{ transform:rotate(180deg); }
+.custom-select .cs-listbox{ position:absolute; left:0; right:0; top:calc(100% + 8px); background:#15130f; border:1px solid rgba(238,203,122,.28); border-radius:12px; padding:6px; box-shadow:0 24px 60px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.2); z-index:60; max-height:264px; overflow:auto; opacity:0; visibility:hidden; transform:translateY(-6px) scale(.98); transform-origin:top; transition:opacity .18s var(--ease), transform .18s var(--ease), visibility .18s; }
+.custom-select.open .cs-listbox{ opacity:1; visibility:visible; transform:translateY(0) scale(1); }
+.custom-select .cs-option{ padding:11px 12px; border-radius:8px; font-size:13.5px; color:var(--ink-dim); cursor:pointer; transition:background .16s,color .16s; }
+.custom-select .cs-option:hover{ background:rgba(201,162,76,.12); color:var(--ink); }
+.custom-select .cs-option.sel{ background:rgba(201,162,76,.16); color:var(--gold-2); font-weight:600; }
+.custom-select .cs-listbox::-webkit-scrollbar{ width:6px; }
+.custom-select .cs-listbox::-webkit-scrollbar-thumb{ background:var(--gold-dim); border-radius:10px; }
 .field textarea{ resize:vertical; min-height:70px; }
 .row2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 .mybookings{ margin-top:26px; }
@@ -447,7 +477,29 @@ img{max-width:100%; display:block;}
 .appointment-card{margin-top:18px;border:1px solid rgba(238,203,122,.18);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.015));border-radius:16px;padding:16px;box-shadow:0 16px 42px rgba(0,0,0,.22)}
 .appointment-card .ac-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}.appointment-card .ac-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em}.appointment-card .ac-ref{font-size:9px;letter-spacing:.16em;color:var(--ink-faint);text-transform:uppercase;margin-top:3px}.appointment-card .ac-status{font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:7px 9px;border-radius:999px;border:1px solid rgba(201,162,76,.28);color:var(--gold-2);white-space:nowrap}.appointment-card .ac-status.pending{color:var(--ink-faint);border-color:var(--line-soft)}.appointment-card .ac-status.cancelled{color:#d98c8c;border-color:rgba(217,140,140,.25)}
 .ac-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.ac-item{padding:11px 12px;border:1px solid var(--line-soft);border-radius:11px;background:rgba(0,0,0,.12)}.ac-item .k{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:5px}.ac-item .v{font-size:12px;line-height:1.35}.ac-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.ac-actions .btn{min-height:42px}.ac-cancel-note{font-size:10px;color:var(--ink-faint);line-height:1.5;margin-top:10px}.ac-cancel-note strong{color:var(--ink)}
-.booking-modal{position:fixed;inset:0;z-index:11000;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);padding:14px}.booking-modal.show{display:flex}.booking-modal .modal-card{width:min(100%,520px);max-height:90vh;overflow:auto;background:#11100d;border:1px solid rgba(238,203,122,.2);border-radius:18px 18px 12px 12px;padding:20px;box-shadow:0 24px 80px rgba(0,0,0,.55)}.booking-modal h3{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em;margin:0 0 6px}.booking-modal .modal-sub{font-size:11px;color:var(--ink-faint);line-height:1.5;margin-bottom:16px}.booking-modal .modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.booking-modal .danger{border-color:rgba(217,140,140,.35);color:#e2a0a0}.verify-card{text-align:left}.verify-mark{width:44px;height:44px;border:1px solid rgba(238,203,122,.28);border-radius:50%;display:grid;place-items:center;color:var(--accent);font-size:20px;margin-bottom:14px;background:rgba(201,162,76,.05)}.verify-eyebrow{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}.verify-card h3{font-size:30px!important}.verify-ref{display:inline-flex;margin:2px 0 18px;padding:7px 10px;border:1px solid rgba(238,203,122,.16);border-radius:8px;color:var(--ink-faint);font-size:10px;letter-spacing:.12em;text-transform:uppercase}.verify-label{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 7px}.verify-card .input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:13px 14px;color:var(--ink);font:inherit;outline:none}.verify-card .input:focus{border-color:rgba(238,203,122,.5);box-shadow:0 0 0 3px rgba(201,162,76,.08)}.verify-actions{display:grid;grid-template-columns:1fr 1.35fr;gap:8px;margin-top:14px}.verify-note{font-size:10px;color:var(--ink-faint);line-height:1.5;margin-top:12px}.receipt-sheet{position:fixed;left:-100000px;top:0;width:390px;background:#11100d;color:#f4efe4;padding:26px;font-family:Jost,Arial,sans-serif}.receipt-sheet .rs-logo{display:block;width:110px;height:110px;object-fit:contain;margin:0 auto 14px}.receipt-sheet .rs-eyebrow{font-size:9px;letter-spacing:.2em;text-align:center;color:#eecb7a;text-transform:uppercase}.receipt-sheet .rs-title{text-align:center;font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.05em;margin:5px 0}.receipt-sheet .rs-ref{text-align:center;font-size:10px;letter-spacing:.18em;color:#aaa;text-transform:uppercase;margin-bottom:22px}.receipt-sheet .rs-status{text-align:center;border:1px solid rgba(238,203,122,.35);padding:9px;border-radius:10px;color:#eecb7a;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:18px}.receipt-sheet .rs-section{border-top:1px solid rgba(255,255,255,.12);padding-top:14px;margin-top:14px}.receipt-sheet .rs-label{font-size:8px;letter-spacing:.18em;color:#999;text-transform:uppercase;margin-bottom:6px}.receipt-sheet .rs-value{font-size:13px;line-height:1.5}.receipt-sheet .rs-footer{text-align:center;color:#888;font-size:9px;line-height:1.6;margin-top:24px}.receipt-sheet .rs-qr{margin:18px auto 0;width:120px;height:120px;border:1px solid rgba(255,255,255,.1);padding:5px}
+.booking-modal{position:fixed;inset:0;z-index:11000;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);padding:14px}.booking-modal.show{display:flex}.booking-modal .modal-card{width:min(100%,520px);max-height:90vh;overflow:auto;background:#11100d;border:1px solid rgba(238,203,122,.2);border-radius:18px 18px 12px 12px;padding:20px;box-shadow:0 24px 80px rgba(0,0,0,.55)}.booking-modal h3{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em;margin:0 0 6px}.booking-modal .modal-sub{font-size:11px;color:var(--ink-faint);line-height:1.5;margin-bottom:16px}.booking-modal .modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.booking-modal .danger{border-color:rgba(217,140,140,.35);color:#e2a0a0}.verify-card{text-align:left}.verify-mark{width:44px;height:44px;border:1px solid rgba(238,203,122,.28);border-radius:50%;display:grid;place-items:center;color:var(--accent);font-size:20px;margin-bottom:14px;background:rgba(201,162,76,.05)}.verify-eyebrow{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}.verify-card h3{font-size:30px!important}.verify-ref{display:inline-flex;margin:2px 0 18px;padding:7px 10px;border:1px solid rgba(238,203,122,.16);border-radius:8px;color:var(--ink-faint);font-size:10px;letter-spacing:.12em;text-transform:uppercase}.verify-label{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 7px}.verify-card .input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:13px 14px;color:var(--ink);font:inherit;outline:none}.verify-card .input:focus{border-color:rgba(238,203,122,.5);box-shadow:0 0 0 3px rgba(201,162,76,.08)}.verify-actions{display:grid;grid-template-columns:1fr 1.35fr;gap:8px;margin-top:14px}.verify-note{font-size:10px;color:var(--ink-faint);line-height:1.5;margin-top:12px}/* Receipt: now a real, always-visible card rendered inline inside the receipt modal —
+   no more off-screen positioning tricks, which is what made the exported file blank. */
+.receipt-modal .modal-card{ width:min(100%,430px); padding:0; background:transparent; border:none; box-shadow:none; }
+.receipt-sheet{width:100%;box-sizing:border-box;background:#11100d;color:#f4efe4;padding:28px;font-family:Jost,Arial,sans-serif;border:1px solid rgba(238,203,122,.22);border-radius:18px;box-shadow:0 24px 80px rgba(0,0,0,.55)}
+.receipt-sheet .rs-logo{display:block;width:96px;height:96px;object-fit:contain;margin:0 auto 14px}
+.receipt-sheet .rs-eyebrow{font-size:9px;letter-spacing:.2em;text-align:center;color:#eecb7a;text-transform:uppercase}
+.receipt-sheet .rs-title{text-align:center;font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.05em;margin:5px 0}
+.receipt-sheet .rs-ref{text-align:center;font-size:10px;letter-spacing:.18em;color:#aaa;text-transform:uppercase;margin-bottom:22px}
+.receipt-sheet .rs-status{text-align:center;border:1px solid rgba(238,203,122,.35);padding:9px;border-radius:10px;color:#eecb7a;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:18px}
+.receipt-sheet .rs-section{border-top:1px solid rgba(255,255,255,.12);padding-top:14px;margin-top:14px}
+.receipt-sheet .rs-label{font-size:8px;letter-spacing:.18em;color:#999;text-transform:uppercase;margin-bottom:6px}
+.receipt-sheet .rs-value{font-size:13px;line-height:1.5}
+.receipt-sheet .rs-footer{text-align:center;color:#888;font-size:9px;line-height:1.6;margin-top:24px}
+.receipt-sheet .rs-qr{margin:18px auto 0;width:120px;height:120px;border:1px solid rgba(255,255,255,.1);padding:5px}
+.receipt-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.receipt-close-row{text-align:center;margin-top:10px}
+.receipt-close-row button{background:none;border:none;color:var(--ink-faint);font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;padding:6px}
+.receipt-close-row button:hover{color:var(--ink)}
+@media print{
+  body *{ visibility:hidden; }
+  .receipt-sheet, .receipt-sheet *{ visibility:visible; }
+  .receipt-sheet{ position:fixed; inset:0; margin:auto; border:none; box-shadow:none; border-radius:0; }
+}
 @media(max-width:640px){.ac-grid{grid-template-columns:1fr}.ac-actions{grid-template-columns:1fr}.appointment-card{padding:14px}.booking-modal{padding:0}.booking-modal .modal-card{border-radius:18px 18px 0 0;padding:18px}}
 /* ================= PREMIUM V2 UX POLISH ================= */
 :root{--premium-border:rgba(238,203,122,.18);--premium-glow:rgba(201,162,76,.12);--premium-surface:rgba(255,255,255,.025)}
@@ -460,21 +512,13 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
 .svc-card:hover,.announce-card:hover,.testi-card:hover{box-shadow:0 18px 45px rgba(0,0,0,.32),0 0 0 1px var(--premium-border);border-color:var(--premium-border)}
 .field input,.field select,.field textarea{transition:border-color .25s var(--ease),box-shadow .25s var(--ease),background .25s var(--ease)}
 .field input:focus,.field select:focus,.field textarea:focus{background:rgba(255,255,255,.035);box-shadow:0 0 0 4px var(--premium-glow)}
-/* Booking progress */
-.booking-progress{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 28px}
-.booking-step{position:relative;padding:12px 10px;border:1px solid var(--line-soft);background:var(--premium-surface);text-align:center;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);transition:.3s var(--ease)}
-.booking-step:first-child{border-radius:10px 0 0 10px}.booking-step:last-child{border-radius:0 10px 10px 0}
-.booking-step .num{display:block;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.04em;margin-bottom:2px}
-.booking-step.active{color:var(--ink);border-color:rgba(238,203,122,.45);background:rgba(201,162,76,.08);box-shadow:inset 0 -2px 0 var(--gold)}
-.booking-step.done{color:var(--gold-2)}
-.booking-step.done .num::after{content:' ✓';font-family:Jost,sans-serif;font-size:11px}
 /* Floating mobile booking CTA */
 .mobile-book-cta{display:none;position:fixed;z-index:80;left:14px;right:14px;bottom:14px;padding:13px 18px;border:1px solid rgba(238,203,122,.5);border-radius:14px;background:rgba(16,14,10,.94);backdrop-filter:blur(16px);box-shadow:0 16px 40px rgba(0,0,0,.45),0 0 0 1px rgba(201,162,76,.08);text-align:center;font-size:12px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--gold-2)}
 .mobile-book-cta.show{display:block;animation:premiumUp .4s var(--ease)}
 @keyframes premiumUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:640px){.booking-progress{gap:4px;margin-bottom:20px}.booking-step{padding:9px 4px;font-size:8px}.booking-step .num{font-size:16px}.mobile-book-cta{display:block}.mobile-book-cta.show{display:block}body{padding-bottom:64px}}
+@media(max-width:640px){.mobile-book-cta{display:block}.mobile-book-cta.show{display:block}body{padding-bottom:64px}}
 @media(max-width:980px){.book-wrap{grid-template-columns:1fr;gap:30px;padding:28px}.cal{max-width:460px}}
-@media(max-width:640px){.book-wrap{padding:20px}.booking-progress{margin-top:-8px}}
+@media(max-width:640px){.book-wrap{padding:20px}}
 @media(min-width:641px){.mobile-book-cta{display:none!important}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn,.svc-card,.announce-card,.testi-card{transition:none!important}.reveal{transition:none!important}.mobile-book-cta{animation:none!important}}
 
@@ -649,12 +693,6 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
         <div class="eyebrow">Reserve Your Chair</div>
         <h2 class="section-title">Book An <em>Appointment</em></h2>
       </div>
-      <div class="booking-progress reveal" id="bookingProgress" aria-label="Booking progress">
-        <div class="booking-step active" data-step="1"><span class="num">01</span>Service</div>
-        <div class="booking-step" data-step="2"><span class="num">02</span>Date</div>
-        <div class="booking-step" data-step="3"><span class="num">03</span>Time</div>
-        <div class="booking-step" data-step="4"><span class="num">04</span>Confirm</div>
-      </div>
       <div class="book-wrap reveal">
         <div class="cal">
           <div class="cal-head">
@@ -662,6 +700,12 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
             <div class="cal-nav"><button id="calPrev">‹</button><button id="calNext">›</button></div>
           </div>
           <div class="cal-grid" id="calGrid"></div>
+          <div class="cal-legend">
+            <span class="lg-open"><i></i>Open</span>
+            <span class="lg-booked"><i></i>Some Booked</span>
+            <span class="lg-full"><i></i>Fully Booked</span>
+            <span class="lg-sel"><i></i>Selected</span>
+          </div>
           <div id="hoursNote" class="helptext" style="margin-top:14px;"></div>
           <div class="slots" id="slotsWrap"></div>
         </div>
@@ -683,16 +727,16 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
     <div class="container">
       <div class="about-grid contact-grid" style="grid-template-columns:1fr 1fr; gap:50px;">
         <div class="reveal">
-          <div class="eyebrow">Hours</div>
-          <h2 class="section-title" style="font-size:clamp(32px,4.6vw,48px)">When We're <em>Open</em></h2>
-          <div class="hours-list" id="hoursList"></div>
-        </div>
-        <div class="reveal">
           <div class="eyebrow">Find Us</div>
           <h2 class="section-title" style="font-size:clamp(32px,4.6vw,48px)">Visit The <em>Shop</em></h2>
           <p style="color:var(--ink-dim); margin-top:18px; line-height:1.9; font-size:15px;" id="contactAddress">123 Confidence Ave, Makati City, Metro Manila</p>
           <p style="color:var(--ink-dim); margin-top:6px; font-size:15px;" id="contactPhone">📞 +63 900 000 0000</p>
           <div class="social-row" id="socialRow"></div>
+        </div>
+        <div class="reveal">
+          <div class="eyebrow">Hours</div>
+          <h2 class="section-title" style="font-size:clamp(32px,4.6vw,48px)">When We're <em>Open</em></h2>
+          <div class="hours-list" id="hoursList"></div>
         </div>
       </div>
     </div>
@@ -756,16 +800,25 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
     <div class="verify-note">Your number is used only to verify this appointment.</div>
   </div>
 </div>
-<div class="receipt-sheet" id="receiptSheet">
-  <img class="rs-logo" id="receiptLogo" alt="Shop logo">
-  <div class="rs-eyebrow" id="receiptShopName"></div>
-  <div class="rs-title">Appointment Confirmation</div>
-  <div class="rs-ref" id="receiptRef"></div>
-  <div class="rs-status">Appointment Confirmed</div>
-  <div class="rs-section"><div class="rs-label">Client</div><div class="rs-value" id="receiptClient"></div></div>
-  <div class="rs-section"><div class="rs-label">Appointment</div><div class="rs-value" id="receiptAppointment"></div></div>
-  <div class="rs-section"><div class="rs-label">Location</div><div class="rs-value" id="receiptLocation"></div></div>
-  <div class="rs-footer">Please arrive 5–10 minutes early.<br>Keep this confirmation for your records.</div>
+<div class="booking-modal receipt-modal" id="receiptModal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="receiptShopName">
+    <div class="receipt-sheet" id="receiptSheet">
+      <img class="rs-logo" id="receiptLogo" alt="Shop logo">
+      <div class="rs-eyebrow" id="receiptShopName"></div>
+      <div class="rs-title">Appointment Confirmation</div>
+      <div class="rs-ref" id="receiptRef"></div>
+      <div class="rs-status">Appointment Confirmed</div>
+      <div class="rs-section"><div class="rs-label">Client</div><div class="rs-value" id="receiptClient"></div></div>
+      <div class="rs-section"><div class="rs-label">Appointment</div><div class="rs-value" id="receiptAppointment"></div></div>
+      <div class="rs-section"><div class="rs-label">Location</div><div class="rs-value" id="receiptLocation"></div></div>
+      <div class="rs-footer">Please arrive 5–10 minutes early.<br>Keep this confirmation for your records.</div>
+    </div>
+    <div class="receipt-actions">
+      <button class="btn" id="receiptPrint">Print</button>
+      <button class="btn btn-solid" id="receiptSave"><span>Save as PDF</span></button>
+    </div>
+    <div class="receipt-close-row"><button id="receiptClose" type="button">Close</button></div>
+  </div>
 </div>
 <div id="lightbox">
     <button class="lb-close" id="lbClose">CLOSE ✕</button>
@@ -800,6 +853,71 @@ function $(s,el){ return (el||document).querySelector(s); }
 function $all(s,el){ return Array.from((el||document).querySelectorAll(s)); }
 function esc(s){ return (s==null?"":String(s)).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
+/* ---- Custom dropdown: wraps a native <select> in a fully themed widget so it never
+   falls back to the browser's own (mismatched, washed-out) popup styling. The native
+   select stays in the DOM (visually hidden) as the single source of truth — its value
+   and "change" event still work exactly as before, so all existing booking logic that
+   reads $("#bkService").value keeps working untouched. ---- */
+function initCustomSelect(selectId){
+  const select = document.getElementById(selectId);
+  if(!select || select.dataset.csInit) return;
+  select.dataset.csInit = "1";
+
+  const wrap = document.createElement("div");
+  wrap.className = "custom-select";
+  select.classList.add("native-select-hidden");
+  select.setAttribute("tabindex","-1");
+  select.setAttribute("aria-hidden","true");
+  select.parentNode.insertBefore(wrap, select);
+  wrap.appendChild(select);
+
+  const trigger = document.createElement("button");
+  trigger.type = "button";
+  trigger.className = "cs-trigger";
+  trigger.setAttribute("aria-haspopup","listbox");
+  trigger.setAttribute("aria-expanded","false");
+  trigger.innerHTML = `<span class="cs-value"></span><span class="cs-chevron">▾</span>`;
+
+  const listbox = document.createElement("div");
+  listbox.className = "cs-listbox";
+  listbox.setAttribute("role","listbox");
+
+  wrap.appendChild(trigger);
+  wrap.appendChild(listbox);
+
+  function sync(){
+    const opt = select.options[select.selectedIndex];
+    const valueEl = trigger.querySelector(".cs-value");
+    valueEl.textContent = opt ? opt.textContent : "Select a service";
+    valueEl.classList.toggle("placeholder", !opt);
+    listbox.innerHTML = Array.from(select.options).map((o,i)=>
+      `<div class="cs-option ${i===select.selectedIndex?'sel':''}" role="option" data-value="${esc(o.value)}">${esc(o.textContent)}</div>`
+    ).join("");
+  }
+  sync();
+
+  new MutationObserver(sync).observe(select, { childList:true, subtree:true });
+  select.addEventListener("change", sync);
+
+  function openList(){ wrap.classList.add("open"); trigger.setAttribute("aria-expanded","true"); }
+  function closeList(){ wrap.classList.remove("open"); trigger.setAttribute("aria-expanded","false"); }
+
+  trigger.addEventListener("click", e=>{ e.stopPropagation(); wrap.classList.contains("open") ? closeList() : openList(); });
+  trigger.addEventListener("keydown", e=>{
+    if(e.key==="Escape"){ closeList(); return; }
+    if(e.key==="Enter" || e.key===" " || e.key==="ArrowDown"){ e.preventDefault(); openList(); }
+  });
+  listbox.addEventListener("click", e=>{
+    const opt = e.target.closest(".cs-option"); if(!opt) return;
+    if(select.value !== opt.dataset.value){
+      select.value = opt.dataset.value;
+      select.dispatchEvent(new Event("change", { bubbles:true }));
+    }
+    closeList();
+  });
+  document.addEventListener("click", e=>{ if(!wrap.contains(e.target)) closeList(); });
+}
+
 /* ---- Overlay helpers: keeps scroll locked and Escape wired for any modal/lightbox ---- */
 let openOverlayCount = 0;
 function openOverlay(el){
@@ -818,7 +936,7 @@ function closeOverlay(el){
 }
 function closeTopOverlay(){
   // Close whichever overlay is currently visible, most-recently-relevant first.
-  const order = ["#phoneVerifyModal","#bookingModal","#lightbox"];
+  const order = ["#phoneVerifyModal","#receiptModal","#bookingModal","#lightbox"];
   for(const sel of order){
     const el = $(sel);
     if(el && el.classList.contains("show")){ closeOverlay(el); return true; }
@@ -1146,6 +1264,7 @@ function renderClient(){
 
   // booking service select
   $("#bkService").innerHTML = DATA.services.map(s=>`<option value="${s.id}">${esc(s.name)} — ₱${s.price} (${s.duration}min)</option>`).join("");
+  initCustomSelect("bkService");
 
   initCalendar();
   renderMyBookings();
@@ -1214,6 +1333,10 @@ function initCalendar(){
   $("#bookingModal").addEventListener("click", e=>{ if(e.target.id==="bookingModal") closeBookingModal(); });
   $("#bookingModalCancel").addEventListener("click", async e=>{ const b=DATA.bookings.find(x=>x.id===e.currentTarget.dataset.bookingId); if(b) await cancelBooking(b); });
   $("#myBookingsWrap").addEventListener("click", async e=>{ const r=e.target.closest('[data-receipt]'); if(r){const b=DATA.bookings.find(x=>x.id===r.dataset.receipt); if(b) await downloadBookingReceipt(b); return;} const m=e.target.closest('[data-manage]'); if(m){const b=DATA.bookings.find(x=>x.id===m.dataset.manage); if(b) openBookingModal(b);} });
+  $("#receiptPrint").addEventListener("click", printReceipt);
+  $("#receiptSave").addEventListener("click", saveReceiptPdf);
+  $("#receiptClose").addEventListener("click", ()=> closeOverlay($("#receiptModal")));
+  $("#receiptModal").addEventListener("click", e=>{ if(e.target.id==="receiptModal") closeOverlay($("#receiptModal")); });
 }
 
 
@@ -1297,6 +1420,7 @@ function renderCal(){
     if(isPast) cls += " past";
     else if(isClosed) cls += " closed";
     else if(isFull) cls += " full";
+    if(d.getTime()===today.getTime()) cls += " today";
     if(key===selectedDateKey) cls += " sel";
     html += `<div class="${cls}" data-key="${key}">${day}${(!isPast && !isClosed && taken>0 && !isFull)?'<span class="d"></span>':''}</div>`;
   }
@@ -1410,8 +1534,21 @@ function openBookingModal(b){
   openOverlay(modal);
 }
 function closeBookingModal(){ closeOverlay($('#bookingModal')); }
+let currentReceiptBooking = null;
+/* Waits for an <img> to actually finish loading (or fail) before we try to render/export
+   it. Capturing a receipt whose logo hasn't loaded yet is a common cause of a blank or
+   broken export, so we always await this first. */
+function waitForImage(img){
+  return new Promise(resolve=>{
+    if(!img.src || img.complete){ resolve(); return; }
+    const done=()=>{ img.removeEventListener('load',done); img.removeEventListener('error',done); resolve(); };
+    img.addEventListener('load',done); img.addEventListener('error',done);
+    setTimeout(done, 1500); // safety timeout so a slow/broken logo never blocks the receipt
+  });
+}
 async function downloadBookingReceipt(b){
   if(!b || b.status!=='confirmed'){ toast('The appointment must be confirmed before downloading its confirmation.','err'); return; }
+  currentReceiptBooking = b;
   const logo=$('#receiptLogo'); logo.src=$('.hero-art .logo-3d')?.src || '';
   $('#receiptShopName').textContent=DATA.meta.name||'Ava Barbershop';
   $('#receiptRef').textContent=bookingRef(b);
@@ -1419,21 +1556,36 @@ async function downloadBookingReceipt(b){
   const svc=DATA.services.find(s=>s.id===b.serviceId); const duration=b.duration||svc?.duration||DATA.slotMinutes||30;
   $('#receiptAppointment').innerHTML=`${esc(b.serviceName)}<br>${esc(fmtDisplayDate(b.date))}<br><strong>${esc(fmtTime12(b.time))}</strong><br>${duration} minutes`;
   $('#receiptLocation').textContent=DATA.wordings.address||'Ava Barbershop';
-  const sheet=$('#receiptSheet');
-  const previous={position:sheet.style.position,left:sheet.style.left,top:sheet.style.top,zIndex:sheet.style.zIndex,opacity:sheet.style.opacity,pointerEvents:sheet.style.pointerEvents};
+  await waitForImage(logo);
+  // The receipt is now rendered as a real, visible card in an open modal — not an
+  // off-screen element — so Print and Save both capture exactly what's on screen.
+  openOverlay($('#receiptModal'));
+}
+function printReceipt(){
+  if(!$('#receiptModal')?.classList.contains('show')) return;
+  window.print();
+}
+async function saveReceiptPdf(){
+  const b = currentReceiptBooking;
+  const sheet = $('#receiptSheet');
+  if(!sheet) return;
   try{
-    // html2canvas cannot reliably capture an element positioned far outside the viewport.
-    // Temporarily place the receipt on-canvas while generating, then restore it.
-    sheet.style.position='fixed'; sheet.style.left='0'; sheet.style.top='0'; sheet.style.zIndex='-1'; sheet.style.opacity='1'; sheet.style.pointerEvents='none';
     if(window.html2pdf){
-      await window.html2pdf().set({margin:0.18,filename:`${bookingRef(b)}-appointment-confirmation.pdf`,image:{type:'jpeg',quality:.96},html2canvas:{scale:2,useCORS:true,backgroundColor:'#11100d',logging:false},jsPDF:{unit:'in',format:[4.1,6.7],orientation:'portrait'}}).from(sheet).save();
+      await window.html2pdf().set({
+        margin:0.18,
+        filename:`${b?bookingRef(b):'appointment'}-appointment-confirmation.pdf`,
+        image:{type:'jpeg',quality:.96},
+        html2canvas:{scale:2,useCORS:true,backgroundColor:'#11100d',logging:false},
+        jsPDF:{unit:'in',format:[4.1,6.7],orientation:'portrait'}
+      }).from(sheet).save();
+      toast('Your appointment confirmation is ready.','ok');
     } else {
-      const w=window.open('','_blank'); if(!w){toast('Please allow pop-ups to print your confirmation.','err');return;}
-      w.document.write('<html><head><title>Appointment Confirmation</title><style>body{margin:0;background:#11100d;color:#f4efe4;font-family:Arial,sans-serif}*{box-sizing:border-box}</style></head><body>'+sheet.outerHTML+'</body></html>'); w.document.close(); w.focus(); setTimeout(()=>w.print(),500);
+      // No PDF library available (e.g. offline) — printing to PDF is a reliable fallback
+      // available in every browser's print dialog.
+      toast('Opening the print dialog — choose "Save as PDF" as the destination.','info');
+      window.print();
     }
-    toast('Your appointment confirmation is ready.','ok');
-  }catch(e){ console.error(e); toast('We could not create your confirmation. Please try again.','err'); }
-  finally{ Object.assign(sheet.style,previous); }
+  }catch(e){ console.error(e); toast('We could not create the PDF. Try Print instead and save as PDF from there.','err'); }
 }
 function openPhoneVerify(b){
   return new Promise(resolve=>{
