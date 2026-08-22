@@ -1476,10 +1476,17 @@ async function downloadBookingReceipt(b){
       // document, so a PNG is simpler, more reliable across browsers, and easier to
       // share/print than a PDF for something this size.
       const canvas = await window.html2pdf().set({image:{type:'png',quality:1},html2canvas:{scale:2,useCORS:true,backgroundColor:'#11100d',logging:false}}).from(sheet).toCanvas().get('canvas');
+      // Use toBlob() rather than toDataURL(): a data-URI download can get mishandled
+      // (truncated or saved as raw text) by mobile browsers, producing a corrupted file.
+      // A real Blob + object URL downloads as actual binary PNG bytes everywhere.
+      const blob = await new Promise(resolve=> canvas.toBlob(resolve, 'image/png', 1));
+      if(!blob) throw new Error('Canvas produced no image data.');
+      const url = URL.createObjectURL(blob);
       const link=document.createElement('a');
       link.download=`${bookingRef(b)}-appointment-confirmation.png`;
-      link.href=canvas.toDataURL('image/png');
+      link.href=url;
       document.body.appendChild(link); link.click(); link.remove();
+      setTimeout(()=> URL.revokeObjectURL(url), 4000);
     } else {
       const w=window.open('','_blank'); if(!w){toast('Please allow pop-ups to print your confirmation.','err');return;}
       w.document.write('<html><head><title>Appointment Confirmation</title><style>body{margin:0;background:#11100d;color:#f4efe4;font-family:Arial,sans-serif}*{box-sizing:border-box}</style></head><body>'+sheet.outerHTML+'</body></html>'); w.document.close(); w.focus(); setTimeout(()=>w.print(),500);
