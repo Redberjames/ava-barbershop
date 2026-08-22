@@ -14,14 +14,14 @@
 <meta property="og:site_name" content="Ava Barbershop">
 <meta property="og:title" content="Ava Barbershop — I don't sell haircuts, I sell confidence.">
 <meta property="og:description" content="Premium cuts, hot towel shaves, and old-school craft with a modern edge. Book your chair online.">
-<meta property="og:image" content="https://www.avabarbershop.com/assets/logo-large.webp">
+<meta property="og:image" content="https://www.avabarbershop.com/logo-large.webp">
 <meta property="og:url" content="https://www.avabarbershop.com/">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Ava Barbershop — I don't sell haircuts, I sell confidence.">
 <meta name="twitter:description" content="Premium cuts, hot towel shaves, and old-school craft with a modern edge. Book your chair online.">
-<meta name="twitter:image" content="https://www.avabarbershop.com/assets/logo-large.webp">
+<meta name="twitter:image" content="https://www.avabarbershop.com/logo-large.webp">
 
 <!-- Local business structured data (also refreshed dynamically once admin content loads — see renderClient()) -->
 <script type="application/ld+json" id="ldjson-business">
@@ -30,7 +30,7 @@
   "@type": "HairSalon",
   "name": "Ava Barbershop",
   "description": "Premium cuts, hot towel shaves, and old-school craft with a modern edge.",
-  "image": "https://www.avabarbershop.com/assets/logo-large.webp",
+  "image": "https://www.avabarbershop.com/logo-large.webp",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "123 Confidence Ave, Makati City, Metro Manila"
@@ -499,7 +499,7 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
 <div class="toast-wrap" id="toastWrap"></div>
 
 <div id="loader">
-  <img src="assets/logo-large.webp" alt="">
+  <img src="logo-large.webp" alt="">
   <div class="ldtext">AVA BARBERSHOP</div>
   <div class="spinner"></div>
 </div>
@@ -508,7 +508,7 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
 
   <nav id="nav">
     <a href="#hero" class="brand">
-      <img src="assets/logo-small.webp" alt="Ava Barbershop logo">
+      <img src="logo-small.webp" alt="Ava Barbershop logo">
       <div>
         <div class="bn" id="brandName">AVA BARBERSHOP</div>
         <div class="bt">Est. 2020</div>
@@ -554,7 +554,7 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
         <div class="disc d2"></div>
         <div class="disc d1"></div>
         <div class="disc d3"></div>
-        <img class="logo-3d tilt floaty" src="assets/logo-large.webp" alt="Ava Barbershop">
+        <img class="logo-3d tilt floaty" src="logo-large.webp" alt="Ava Barbershop">
       </div>
     </div>
     <a href="#announcements" class="scrolldown"><span>Scroll</span><span class="bar"></span></a>
@@ -711,7 +711,7 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
       <div class="foot-grid">
         <div>
           <div class="foot-brand">
-            <img src="assets/logo-small.webp" alt="Ava Barbershop logo">
+            <img src="logo-small.webp" alt="Ava Barbershop logo">
             <div class="bn">AVA BARBERSHOP</div>
           </div>
           <p id="footTagline">I don't sell haircuts, I sell confidence.</p>
@@ -765,7 +765,7 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
   </div>
 </div>
 <div class="receipt-sheet" id="receiptSheet">
-  <img class="rs-logo" id="receiptLogo" alt="Shop logo">
+  <img class="rs-logo" id="receiptLogo" alt="Shop logo" crossorigin="anonymous">
   <div class="rs-eyebrow" id="receiptShopName"></div>
   <div class="rs-title">Appointment Confirmation</div>
   <div class="rs-ref" id="receiptRef"></div>
@@ -1466,8 +1466,20 @@ async function downloadBookingReceipt(b){
     // sheet renders invisibly behind the page's opaque content and html2canvas captures a blank page.
     sheet.style.position='fixed'; sheet.style.left='0'; sheet.style.top='0'; sheet.style.zIndex='100000'; sheet.style.opacity='1'; sheet.style.pointerEvents='none';
     if(logo.src && logo.decode) { try{ await logo.decode(); }catch(_){} }
+    // The sheet was just moved on-canvas and its logo/fonts may not be painted yet.
+    // Wait for web fonts to finish loading, then give the browser two animation frames
+    // to actually paint the layout — otherwise html2canvas can snapshot a blank/half-drawn sheet.
+    if(document.fonts && document.fonts.ready){ try{ await document.fonts.ready; }catch(_){} }
+    await new Promise(r=> requestAnimationFrame(()=> requestAnimationFrame(r)));
     if(window.html2pdf){
-      await window.html2pdf().set({margin:0.18,filename:`${bookingRef(b)}-appointment-confirmation.pdf`,image:{type:'jpeg',quality:.96},html2canvas:{scale:2,useCORS:true,backgroundColor:'#11100d',logging:false},jsPDF:{unit:'in',format:[4.1,6.7],orientation:'portrait'}}).from(sheet).save();
+      // Export as PNG rather than PDF: this is a compact receipt card, not a multi-page
+      // document, so a PNG is simpler, more reliable across browsers, and easier to
+      // share/print than a PDF for something this size.
+      const canvas = await window.html2pdf().set({image:{type:'png',quality:1},html2canvas:{scale:2,useCORS:true,backgroundColor:'#11100d',logging:false}}).from(sheet).toCanvas().get('canvas');
+      const link=document.createElement('a');
+      link.download=`${bookingRef(b)}-appointment-confirmation.png`;
+      link.href=canvas.toDataURL('image/png');
+      document.body.appendChild(link); link.click(); link.remove();
     } else {
       const w=window.open('','_blank'); if(!w){toast('Please allow pop-ups to print your confirmation.','err');return;}
       w.document.write('<html><head><title>Appointment Confirmation</title><style>body{margin:0;background:#11100d;color:#f4efe4;font-family:Arial,sans-serif}*{box-sizing:border-box}</style></head><body>'+sheet.outerHTML+'</body></html>'); w.document.close(); w.focus(); setTimeout(()=>w.print(),500);
