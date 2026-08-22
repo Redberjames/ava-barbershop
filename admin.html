@@ -329,9 +329,17 @@ function defaultData(){
       aboutTitle:"THE CHAIR SINCE 2020",
       aboutText:"Ava Barbershop was built on one idea: a great cut changes how you carry yourself. Every chair, every blade, every hot towel is part of a ritual — not just a haircut.",
       aboutPhoto:"https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=1000&auto=format&fit=crop",
+      aboutPoint1Title:"Master Barbers.",
+      aboutPoint1Text:"Trained hands, precise fades, zero shortcuts.",
+      aboutPoint2Title:"Premium Products.",
+      aboutPoint2Text:"Only the good stuff touches your skin and hair.",
+      aboutPoint3Title:"The Ritual.",
+      aboutPoint3Text:"Hot towels, sharp blades, real conversation.",
       footTagline:"I don't sell haircuts, I sell confidence.",
       marqueeKind:"Welcome",
       marqueeText:"Book your next cut today",
+      marqueeClosedText:"Sorry, we're closed for today. Please check our upcoming open schedule.",
+      marqueeBreakText:"Your barber is on a lunch break — be right back!",
       address:"123 Confidence Ave, Makati City, Metro Manila",
       phone:"+63 900 000 0000",
       whatsapp:"",
@@ -601,16 +609,31 @@ function pageWordings(){
         <div class="about-photo-preview" style="margin-top:14px; max-width:220px;">
           <img id="aboutPhotoPreview" src="${esc(w.aboutPhoto)}" style="width:100%; aspect-ratio:4/5; object-fit:cover; border-radius:10px; border:1px solid var(--line);" onerror="this.style.opacity=0.25">
         </div>
+        <div class="helptext" style="margin-top:18px;">The 3 highlight points below the About text ("01 / 02 / 03").</div>
+        <div class="row2">
+          <div class="field"><label for="f_aboutPoint1Title">Point 01 — Title</label><input id="f_aboutPoint1Title" value="${esc(w.aboutPoint1Title)}" placeholder="Master Barbers."></div>
+          <div class="field"><label for="f_aboutPoint1Text">Point 01 — Text</label><input id="f_aboutPoint1Text" value="${esc(w.aboutPoint1Text)}" placeholder="Trained hands, precise fades, zero shortcuts."></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="f_aboutPoint2Title">Point 02 — Title</label><input id="f_aboutPoint2Title" value="${esc(w.aboutPoint2Title)}" placeholder="Premium Products."></div>
+          <div class="field"><label for="f_aboutPoint2Text">Point 02 — Text</label><input id="f_aboutPoint2Text" value="${esc(w.aboutPoint2Text)}" placeholder="Only the good stuff touches your skin and hair."></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="f_aboutPoint3Title">Point 03 — Title</label><input id="f_aboutPoint3Title" value="${esc(w.aboutPoint3Title)}" placeholder="The Ritual."></div>
+          <div class="field"><label for="f_aboutPoint3Text">Point 03 — Text</label><input id="f_aboutPoint3Text" value="${esc(w.aboutPoint3Text)}" placeholder="Hot towels, sharp blades, real conversation."></div>
+        </div>
       </div>
     </div>
     <div class="card">
       <h3>Ticker / Marquee</h3>
       <div class="admin-form">
-        <div class="helptext" style="margin-top:-4px;">This scrolling bar sits right under the hero. Active announcements show here automatically — the text below is only used as a default welcome message when there are no active announcements.</div>
+        <div class="helptext" style="margin-top:-4px;">This scrolling bar sits right under the hero. Active announcements always show here first. With no active announcement, it auto-reports live shop status: your welcome message while open, or the closed/break message below when the shop is closed for the day or your barber is on a scheduled lunch break (set under Operating Hours).</div>
         <div class="row2">
           <div class="field"><label for="f_marqueeKind">Label</label><input id="f_marqueeKind" value="${esc(w.marqueeKind)}" placeholder="Welcome"></div>
-          <div class="field"><label for="f_marqueeText">Message</label><input id="f_marqueeText" value="${esc(w.marqueeText)}" placeholder="Book your next cut today"></div>
+          <div class="field"><label for="f_marqueeText">Welcome Message</label><input id="f_marqueeText" value="${esc(w.marqueeText)}" placeholder="Book your next cut today"></div>
         </div>
+        <div class="field"><label for="f_marqueeClosedText">Closed Message</label><input id="f_marqueeClosedText" value="${esc(w.marqueeClosedText)}" placeholder="Sorry, we're closed for today. Please check our upcoming open schedule."></div>
+        <div class="field"><label for="f_marqueeBreakText">On-Break Message</label><input id="f_marqueeBreakText" value="${esc(w.marqueeBreakText)}" placeholder="Your barber is on a lunch break — be right back!"></div>
       </div>
     </div>
     <div class="card">
@@ -1074,7 +1097,12 @@ function wireAdminPage(page){
       Object.assign(DATA.wordings, {
         heroTitle: $("#f_heroTitle").value, heroSub: $("#f_heroSub").value,
         aboutTitle: $("#f_aboutTitle").value, aboutText: $("#f_aboutText").value, aboutPhoto,
-        footTagline: $("#f_footTagline").value, marqueeKind: $("#f_marqueeKind").value.trim(), marqueeText: $("#f_marqueeText").value.trim(), address: $("#f_address").value, phone: $("#f_phone").value, whatsapp: $("#f_whatsapp").value.trim(),
+        aboutPoint1Title: $("#f_aboutPoint1Title").value.trim(), aboutPoint1Text: $("#f_aboutPoint1Text").value.trim(),
+        aboutPoint2Title: $("#f_aboutPoint2Title").value.trim(), aboutPoint2Text: $("#f_aboutPoint2Text").value.trim(),
+        aboutPoint3Title: $("#f_aboutPoint3Title").value.trim(), aboutPoint3Text: $("#f_aboutPoint3Text").value.trim(),
+        footTagline: $("#f_footTagline").value, marqueeKind: $("#f_marqueeKind").value.trim(), marqueeText: $("#f_marqueeText").value.trim(),
+        marqueeClosedText: $("#f_marqueeClosedText").value.trim(), marqueeBreakText: $("#f_marqueeBreakText").value.trim(),
+        address: $("#f_address").value, phone: $("#f_phone").value, whatsapp: $("#f_whatsapp").value.trim(),
         instagram: $("#f_instagram").value.trim(), facebook: $("#f_facebook").value.trim(), tiktok: $("#f_tiktok").value.trim()
       });
       if(await persist()){ toast("Wordings saved.", "ok"); renderAdminPage(); }

@@ -568,8 +568,8 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
       <a href="#about">About</a>
       <a href="#services">Services</a>
       <a href="#gallery">Gallery</a>
-      <a href="#testimonials">Reviews</a>
       <a href="#book">Book Now</a>
+      <a href="#testimonials">Reviews</a>
       <a href="#contact">Contact</a>
     </div>
     <div class="nav-right">
@@ -632,10 +632,10 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
           <div class="eyebrow">Our Story</div>
           <h2 class="section-title" id="aboutTitle" style="font-size:clamp(32px,4.6vw,52px)">THE CHAIR SINCE <em>2020</em></h2>
           <p id="aboutText">Ava Barbershop was built on one idea: a great cut changes how you carry yourself. Every chair, every blade, every hot towel is part of a ritual — not just a haircut.</p>
-          <ul class="about-list">
-            <li><span class="num">01</span><div><b>Master Barbers.</b> Trained hands, precise fades, zero shortcuts.</div></li>
-            <li><span class="num">02</span><div><b>Premium Products.</b> Only the good stuff touches your skin and hair.</div></li>
-            <li><span class="num">03</span><div><b>The Ritual.</b> Hot towels, sharp blades, real conversation.</div></li>
+          <ul class="about-list" id="aboutList">
+            <li><span class="num">01</span><div><b id="aboutPoint1Title"></b> <span id="aboutPoint1Text"></span></div></li>
+            <li><span class="num">02</span><div><b id="aboutPoint2Title"></b> <span id="aboutPoint2Text"></span></div></li>
+            <li><span class="num">03</span><div><b id="aboutPoint3Title"></b> <span id="aboutPoint3Text"></span></div></li>
           </ul>
         </div>
       </div>
@@ -672,37 +672,6 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
     </div>
   </section>
 
-  <section id="testimonials" class="section">
-    <div class="container">
-      <div class="section-head reveal">
-        <div class="eyebrow">Word On The Street</div>
-        <h2 class="section-title">Client <em>Love</em></h2>
-      </div>
-      <div class="review-grid">
-        <div class="review-form reveal">
-          <div class="eyebrow" style="margin-bottom:10px;">Your Experience</div>
-          <h3>Rate Your Visit</h3>
-          <div class="helptext">Share your experience with the shop. Reviews are checked before they go live.</div>
-          <div class="field" style="margin-top:18px;"><label>Your Rating</label><div class="star-input" id="rvStars"><span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span></div></div>
-          <div class="field" style="margin-top:16px;"><label for="rvName">Your Name</label><input id="rvName" placeholder="Juan Dela Cruz"></div>
-          <div class="field" style="margin-top:16px;"><label for="rvText">Your Review</label><textarea id="rvText" rows="4" placeholder="Tell us about your visit..."></textarea></div>
-          <button class="btn btn-solid" id="rvSubmit" style="margin-top:18px; width:100%;"><span>Submit Review</span></button>
-          <div class="review-form-note"><span class="note-dot"></span> Your review is moderated before publishing.</div>
-        </div>
-        <div class="top-reviews reveal">
-          <div class="top-reviews-head">
-            <div>
-              <div class="eyebrow">Word On The Street</div>
-              <div class="top-reviews-title">Top <em>Reviews</em></div>
-            </div>
-            <div class="rating-summary" id="ratingSummary" aria-live="polite"></div>
-          </div>
-          <div class="testi-grid" id="testiGrid"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <section id="book" class="section">
     <div class="container">
       <div class="section-head reveal">
@@ -734,6 +703,37 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
           <div class="field" style="margin-top:14px;"><label for="bkNotes">Notes (optional)</label><textarea id="bkNotes" placeholder="Any preference for barber or style..."></textarea></div>
           <button class="btn btn-solid" id="bkSubmit" style="margin-top:18px; width:100%;"><span>Confirm Booking</span></button>
           <div class="mybookings" id="myBookingsWrap"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="testimonials" class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">Word On The Street</div>
+        <h2 class="section-title">Client <em>Love</em></h2>
+      </div>
+      <div class="review-grid">
+        <div class="review-form reveal">
+          <div class="eyebrow" style="margin-bottom:10px;">Your Experience</div>
+          <h3>Rate Your Visit</h3>
+          <div class="helptext">Share your experience with the shop. Reviews are checked before they go live.</div>
+          <div class="field" style="margin-top:18px;"><label>Your Rating</label><div class="star-input" id="rvStars"><span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span></div></div>
+          <div class="field" style="margin-top:16px;"><label for="rvName">Your Name</label><input id="rvName" placeholder="Juan Dela Cruz"></div>
+          <div class="field" style="margin-top:16px;"><label for="rvText">Your Review</label><textarea id="rvText" rows="4" placeholder="Tell us about your visit..."></textarea></div>
+          <button class="btn btn-solid" id="rvSubmit" style="margin-top:18px; width:100%;"><span>Submit Review</span></button>
+          <div class="review-form-note"><span class="note-dot"></span> Your review is moderated before publishing.</div>
+        </div>
+        <div class="top-reviews reveal">
+          <div class="top-reviews-head">
+            <div>
+              <div class="eyebrow">Word On The Street</div>
+              <div class="top-reviews-title">Top <em>Reviews</em></div>
+            </div>
+            <div class="rating-summary" id="ratingSummary" aria-live="polite"></div>
+          </div>
+          <div class="testi-grid" id="testiGrid"></div>
         </div>
       </div>
     </div>
@@ -993,9 +993,17 @@ function defaultData(){
       aboutTitle:"THE CHAIR SINCE 2020",
       aboutText:"Ava Barbershop was built on one idea: a great cut changes how you carry yourself. Every chair, every blade, every hot towel is part of a ritual — not just a haircut.",
       aboutPhoto:"https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=1000&auto=format&fit=crop",
+      aboutPoint1Title:"Master Barbers.",
+      aboutPoint1Text:"Trained hands, precise fades, zero shortcuts.",
+      aboutPoint2Title:"Premium Products.",
+      aboutPoint2Text:"Only the good stuff touches your skin and hair.",
+      aboutPoint3Title:"The Ritual.",
+      aboutPoint3Text:"Hot towels, sharp blades, real conversation.",
       footTagline:"I don't sell haircuts, I sell confidence.",
       marqueeKind:"Welcome",
       marqueeText:"Book your next cut today",
+      marqueeClosedText:"Sorry, we're closed for today. Please check our upcoming open schedule.",
+      marqueeBreakText:"Your barber is on a lunch break — be right back!",
       address:"123 Confidence Ave, Makati City, Metro Manila",
       phone:"+63 900 000 0000",
       whatsapp:"",
@@ -1147,24 +1155,40 @@ function layoutMarquee(setHtml){
   const duration = Math.max(18, Math.round(setWidth / 55));
   track.style.animation = `marquee ${duration}s linear infinite`;
 }
-function updateOpenChip(){
-  const chip = $("#navStatus"), dot = $("#heroChipDot"), text = $("#heroChipText");
-  if(!chip || !text || !dot) return;
+/* Single source of truth for "is the shop open right now" — used by both
+   the nav/hero status chip and the ticker fallback message, so they never
+   disagree. Returns one of: closed-today, closed-now, break, open. */
+function getShopStatus(){
   const now = new Date();
   const dow = DOW[now.getDay()];
   const h = DATA.hours && DATA.hours[dow];
-  if(!h || h.closed){
-    text.textContent = "Closed Today";
-    dot.style.background = "var(--danger)"; dot.style.boxShadow = "0 0 8px var(--danger)";
-    return;
-  }
+  if(!h || h.closed) return { state:"closed-today" };
   const cur = now.getHours()*60 + now.getMinutes();
   const [oh,om] = h.open.split(":").map(Number);
   const [ch,cm] = h.close.split(":").map(Number);
   const openMin = oh*60+om, closeMin = ch*60+cm;
-  if(cur >= openMin && cur < closeMin){
+  if(cur < openMin || cur >= closeMin) return { state:"closed-now" };
+  if(h.lunchEnabled && h.lunchStart && h.lunchEnd){
+    const [lh,lm] = h.lunchStart.split(":").map(Number);
+    const [eh,em] = h.lunchEnd.split(":").map(Number);
+    const breakStart = lh*60+lm, breakEnd = eh*60+em;
+    if(cur >= breakStart && cur < breakEnd) return { state:"break" };
+  }
+  return { state:"open" };
+}
+function updateOpenChip(){
+  const chip = $("#navStatus"), dot = $("#heroChipDot"), text = $("#heroChipText");
+  if(!chip || !text || !dot) return;
+  const { state } = getShopStatus();
+  if(state === "open"){
     text.textContent = "Open Now";
     dot.style.background = "var(--success)"; dot.style.boxShadow = "0 0 8px var(--success)";
+  }else if(state === "break"){
+    text.textContent = "On Lunch Break";
+    dot.style.background = "var(--accent)"; dot.style.boxShadow = "0 0 8px var(--accent)";
+  }else if(state === "closed-today"){
+    text.textContent = "Closed Today";
+    dot.style.background = "var(--danger)"; dot.style.boxShadow = "0 0 8px var(--danger)";
   }else{
     text.textContent = "Closed Now";
     dot.style.background = "var(--danger)"; dot.style.boxShadow = "0 0 8px var(--danger)";
@@ -1182,15 +1206,34 @@ function renderClient(){
   $("#aboutTitle").innerHTML = esc(DATA.wordings.aboutTitle||"").replace(/(\d{4})/,'<em>$1</em>');
   $("#aboutText").textContent = DATA.wordings.aboutText||"";
   $("#aboutPhoto").src = DATA.wordings.aboutPhoto || "";
+  $("#aboutPoint1Title").textContent = DATA.wordings.aboutPoint1Title||"";
+  $("#aboutPoint1Text").textContent = DATA.wordings.aboutPoint1Text||"";
+  $("#aboutPoint2Title").textContent = DATA.wordings.aboutPoint2Title||"";
+  $("#aboutPoint2Text").textContent = DATA.wordings.aboutPoint2Text||"";
+  $("#aboutPoint3Title").textContent = DATA.wordings.aboutPoint3Title||"";
+  $("#aboutPoint3Text").textContent = DATA.wordings.aboutPoint3Text||"";
   $("#footTagline").textContent = DATA.wordings.footTagline || DATA.meta.tagline || "";
   $("#contactAddress").textContent = "📍 " + (DATA.wordings.address||"");
   $("#contactPhone").textContent = "📞 " + (DATA.wordings.phone||"");
   $("#yr").textContent = new Date().getFullYear();
   updateOpenChip();
 
-  // marquee — build the scrolling ticker
+  // marquee — build the scrolling ticker. Active announcements always win;
+  // otherwise the bar auto-reports live shop status (closed / on break / open).
   const activeAnn = DATA.announcements.filter(a=>a.active);
-  const marqueeItems = activeAnn.length ? activeAnn : [{kind:DATA.wordings.marqueeKind||"Welcome", title:DATA.wordings.marqueeText||"Book your next cut today"}];
+  let marqueeItems;
+  if(activeAnn.length){
+    marqueeItems = activeAnn;
+  }else{
+    const { state } = getShopStatus();
+    if(state === "closed-today" || state === "closed-now"){
+      marqueeItems = [{kind:"Closed", title: DATA.wordings.marqueeClosedText || "Sorry, we're closed for today. Please check our upcoming open schedule."}];
+    }else if(state === "break"){
+      marqueeItems = [{kind:"On Break", title: DATA.wordings.marqueeBreakText || "Your barber is on a lunch break — be right back!"}];
+    }else{
+      marqueeItems = [{kind:DATA.wordings.marqueeKind||"Welcome", title:DATA.wordings.marqueeText||"Book your next cut today"}];
+    }
+  }
   const mk = marqueeItems.map(a=>`<span><b>${esc(a.kind)}</b> ${esc(a.title)}</span>`).join("");
   marqueeSetHtml = mk;
   layoutMarquee(mk);
@@ -1702,6 +1745,21 @@ function initPremiumUX(){
   if(cta) window.addEventListener('scroll',()=>cta.classList.toggle('show',window.scrollY>520 && window.scrollY < Math.max(600,document.body.scrollHeight-window.innerHeight-300)),{passive:true});
   document.addEventListener("visibilitychange",()=>{ if(!document.hidden) syncClientBookings(); });
   window.setInterval(syncClientBookings,30000);
+  // Keep the open/closed/break chip and the ticker's auto-status message
+  // live without needing a page refresh (e.g. right when lunch break starts).
+  window.setInterval(()=>{
+    updateOpenChip();
+    if(!DATA.announcements.some(a=>a.active)){
+      const { state } = getShopStatus();
+      const msg = state === "break"
+        ? { kind:"On Break", title: DATA.wordings.marqueeBreakText || "Your barber is on a lunch break — be right back!" }
+        : (state === "closed-today" || state === "closed-now")
+          ? { kind:"Closed", title: DATA.wordings.marqueeClosedText || "Sorry, we're closed for today. Please check our upcoming open schedule." }
+          : { kind:DATA.wordings.marqueeKind||"Welcome", title:DATA.wordings.marqueeText||"Book your next cut today" };
+      const mk = `<span><b>${esc(msg.kind)}</b> ${esc(msg.title)}</span>`;
+      if(mk !== marqueeSetHtml){ marqueeSetHtml = mk; layoutMarquee(mk); }
+    }
+  }, 60000);
 }
 
 async function boot(){
