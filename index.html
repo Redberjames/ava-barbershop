@@ -765,6 +765,7 @@ function defaultData(){
       sun:{open:"00:00", close:"00:00", closed:true}
     },
     slotMinutes:30,
+    bookingMode:"manual",
     gallery:[
       {id:uid(), url:"https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=900&auto=format&fit=crop", caption:"Skin fade, freshly cleaned up"},
       {id:uid(), url:"https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=900&auto=format&fit=crop", caption:"Hot towel shave ritual"},
@@ -817,6 +818,7 @@ async function loadData(){
    shop data keeps working after an update (e.g. testimonials added before the
    review-approval flow existed are treated as already-approved admin picks). */
 function normalizeData(d){
+  d.bookingMode = d.bookingMode === "auto" ? "auto" : "manual";
   d.testimonials = (d.testimonials||[]).map(t=> Object.assign({ date: fmtDateKey(new Date()), approved:true, source:"admin" }, t));
   return d;
 }
@@ -1215,7 +1217,8 @@ async function submitBooking(){
   }
   /* Calls a narrow database function instead of writing shop_data directly —
      visitors can only ever append a well-formed, pending booking this way. */
-  const { data: booking, error } = await sb.rpc("submit_booking", {
+  const rpcName = DATA.bookingMode === "auto" ? "submit_booking_auto" : "submit_booking";
+  const { data: booking, error } = await sb.rpc(rpcName, {
     p_name: name, p_phone: phone, p_service_id: svcId,
     p_service_name: svc?svc.name:"Service", p_price: svc?svc.price:0,
     p_duration: duration, p_date: selectedDateKey, p_time: selectedSlot, p_notes: notes
@@ -1226,7 +1229,7 @@ async function submitBooking(){
   const mine = await loadMyBookings();
   mine.push(booking);
   await saveMyBookings(mine);
-  toast("Booking request sent! We'll confirm shortly.", "ok");
+  toast(DATA.bookingMode === "auto" ? "Booking confirmed! Your chair is reserved." : "Booking request sent! We'll confirm shortly.", "ok");
   $("#bkName").value=""; $("#bkPhone").value=""; $("#bkNotes").value="";
   selectedSlot = null;
   renderCal(); renderMyBookings();
