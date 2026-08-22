@@ -496,9 +496,13 @@ img{max-width:100%; display:block;}
 .receipt-close-row button{background:none;border:none;color:var(--ink-faint);font-size:11px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;padding:6px}
 .receipt-close-row button:hover{color:var(--ink)}
 @media print{
-  body *{ visibility:hidden; }
-  .receipt-sheet, .receipt-sheet *{ visibility:visible; }
-  .receipt-sheet{ position:fixed; inset:0; margin:auto; border:none; box-shadow:none; border-radius:0; }
+  html, body{ height:auto !important; width:auto !important; margin:0 !important; padding:0 !important; overflow:visible !important; background:#fff !important; }
+  body > *{ display:none !important; }
+  .booking-modal.receipt-modal{ display:block !important; position:static !important; inset:auto !important; background:none !important; backdrop-filter:none !important; padding:0 !important; }
+  .receipt-modal .modal-card{ width:auto !important; max-height:none !important; overflow:visible !important; margin:0 !important; }
+  .receipt-sheet{ position:static !important; width:auto !important; max-width:420px; margin:0 auto !important; border:none !important; box-shadow:none !important; border-radius:0 !important; page-break-after:avoid; page-break-inside:avoid; }
+  .receipt-actions, .receipt-close-row{ display:none !important; }
+  @page{ size:auto; margin:8mm; }
 }
 @media(max-width:640px){.ac-grid{grid-template-columns:1fr}.ac-actions{grid-template-columns:1fr}.appointment-card{padding:14px}.booking-modal{padding:0}.booking-modal .modal-card{border-radius:18px 18px 0 0;padding:18px}}
 /* ================= PREMIUM V2 UX POLISH ================= */
