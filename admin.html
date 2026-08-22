@@ -154,6 +154,13 @@ img{max-width:100%; display:block;}
 .gal-admin-item{ position:relative; border-radius:8px; overflow:hidden; border:1px solid var(--line); aspect-ratio:1; }
 .gal-admin-item img{ width:100%; height:100%; object-fit:cover; }
 .gal-admin-item .rm{ position:absolute; top:6px; right:6px; width:26px; height:26px; border-radius:50%; background:rgba(0,0,0,.7); color:var(--danger); display:flex; align-items:center; justify-content:center; font-size:13px; border:1px solid var(--danger);}
+.list-row.hair-row{ display:block; }
+.hair-row-top{ display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; }
+.hair-row-main{ display:flex; align-items:center; gap:12px; flex:1; min-width:0; }
+.hair-thumb{ width:44px; height:44px; border-radius:8px; overflow:hidden; border:1px solid var(--line); flex-shrink:0; display:flex; align-items:center; justify-content:center; background:var(--bg-2); color:var(--ink-faint); font-size:15px; }
+.hair-thumb img{ width:100%; height:100%; object-fit:cover; }
+.hair-photo-editor{ display:none; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line); }
+.hair-photo-editor.open{ display:block; }
 .swatches{ display:flex; gap:10px; }
 .swatch{ width:34px; height:34px; border-radius:50%; border:2px solid transparent; cursor:pointer; }
 .swatch.sel{ border-color:#fff; }
@@ -352,6 +359,7 @@ function defaultData(){
       {id:uid(), url:"https://images.unsplash.com/photo-1512690459411-b9245aed614b?q=80&w=900&auto=format&fit=crop", caption:"Classic scissor work"},
       {id:uid(), url:"https://images.unsplash.com/photo-1605497788044-5a32c7078486?q=80&w=900&auto=format&fit=crop", caption:"Beard shape-up"}
     ],
+    haircutImages:{},
     testimonials:[
       {id:uid(), name:"Marco R.", stars:5, text:"Best fade I've had in this city. The chair experience alone is worth it.", date:fmtDateKey(new Date()), approved:true, source:"admin"},
       {id:uid(), name:"Diego T.", stars:5, text:"Walked in stressed, walked out feeling like a new man. Ava Barbershop gets it.", date:fmtDateKey(new Date()), approved:true, source:"admin"},
@@ -391,6 +399,7 @@ async function loadData(){
 function normalizeData(d){
   d.testimonials = (d.testimonials||[]).map(t=> Object.assign({ date: fmtDateKey(new Date()), approved:true, source:"admin" }, t));
   d.bookingMode = d.bookingMode === "auto" ? "auto" : "manual";
+  d.haircutImages = d.haircutImages || {};
   return d;
 }
 let saveTimer=null;
@@ -645,15 +654,51 @@ function renderAnnList(){
 /* ---- Hard-coded Haircut Inspiration Catalog ---- */
 const HAIRCUT_CATALOG = [{"n": "Low Taper Fade", "c": "Taper & Fade"}, {"n": "Mid Taper Fade", "c": "Taper & Fade"}, {"n": "High Taper Fade", "c": "Taper & Fade"}, {"n": "Low Fade", "c": "Taper & Fade"}, {"n": "Mid Fade", "c": "Taper & Fade"}, {"n": "High Fade", "c": "Taper & Fade"}, {"n": "Low Skin Fade", "c": "Taper & Fade"}, {"n": "Mid Skin Fade", "c": "Taper & Fade"}, {"n": "High Skin Fade", "c": "Taper & Fade"}, {"n": "Bald Fade", "c": "Taper & Fade"}, {"n": "Drop Fade", "c": "Taper & Fade"}, {"n": "Burst Fade", "c": "Taper & Fade"}, {"n": "Temple Fade", "c": "Taper & Fade"}, {"n": "Shadow Fade", "c": "Taper & Fade"}, {"n": "Taper Fade", "c": "Taper & Fade"}, {"n": "Skin Taper", "c": "Taper & Fade"}, {"n": "Neck Taper", "c": "Taper & Fade"}, {"n": "Low Drop Fade", "c": "Taper & Fade"}, {"n": "High Drop Fade", "c": "Taper & Fade"}, {"n": "Burst Taper Fade", "c": "Taper & Fade"}, {"n": "Textured Crop", "c": "Crop & Fringe"}, {"n": "French Crop", "c": "Crop & Fringe"}, {"n": "Modern Caesar", "c": "Crop & Fringe"}, {"n": "Textured Fringe", "c": "Crop & Fringe"}, {"n": "Messy Fringe", "c": "Crop & Fringe"}, {"n": "Choppy Crop", "c": "Crop & Fringe"}, {"n": "Short Crop Fade", "c": "Crop & Fringe"}, {"n": "Crop Top Fade", "c": "Crop & Fringe"}, {"n": "Heavy Fringe", "c": "Crop & Fringe"}, {"n": "Blunt Fringe", "c": "Crop & Fringe"}, {"n": "Edgar Cut", "c": "Crop & Fringe"}, {"n": "Textured Edgar", "c": "Crop & Fringe"}, {"n": "Taper Edgar", "c": "Crop & Fringe"}, {"n": "Fluffy Fringe", "c": "Crop & Fringe"}, {"n": "Side-Swept Fringe", "c": "Crop & Fringe"}, {"n": "French Crop Fade", "c": "Crop & Fringe"}, {"n": "Textured Caesar Fade", "c": "Crop & Fringe"}, {"n": "Short Textured Fringe", "c": "Crop & Fringe"}, {"n": "Long Fringe Crop", "c": "Crop & Fringe"}, {"n": "Disconnected Crop", "c": "Crop & Fringe"}, {"n": "Modern Quiff", "c": "Quiff & Pompadour"}, {"n": "Textured Quiff", "c": "Quiff & Pompadour"}, {"n": "Messy Quiff", "c": "Quiff & Pompadour"}, {"n": "Short Quiff", "c": "Quiff & Pompadour"}, {"n": "Quiff Fade", "c": "Quiff & Pompadour"}, {"n": "High-Volume Quiff", "c": "Quiff & Pompadour"}, {"n": "Low Taper Quiff", "c": "Quiff & Pompadour"}, {"n": "Mid Fade Quiff", "c": "Quiff & Pompadour"}, {"n": "Disconnected Quiff", "c": "Quiff & Pompadour"}, {"n": "Curly Quiff", "c": "Quiff & Pompadour"}, {"n": "Classic Pompadour", "c": "Quiff & Pompadour"}, {"n": "Modern Pompadour", "c": "Quiff & Pompadour"}, {"n": "Pompadour Fade", "c": "Quiff & Pompadour"}, {"n": "Low Fade Pompadour", "c": "Quiff & Pompadour"}, {"n": "Undercut Pompadour", "c": "Quiff & Pompadour"}, {"n": "Textured Pompadour", "c": "Quiff & Pompadour"}, {"n": "Messy Pompadour", "c": "Quiff & Pompadour"}, {"n": "Short Pompadour", "c": "Quiff & Pompadour"}, {"n": "Side-Part Pompadour", "c": "Quiff & Pompadour"}, {"n": "Slick Pompadour", "c": "Quiff & Pompadour"}, {"n": "Modern Slick Back", "c": "Slick / Comb / Part"}, {"n": "Slick Back Fade", "c": "Slick / Comb / Part"}, {"n": "Slick Back Undercut", "c": "Slick / Comb / Part"}, {"n": "Textured Slick Back", "c": "Slick / Comb / Part"}, {"n": "Messy Slick Back", "c": "Slick / Comb / Part"}, {"n": "Classic Comb Over", "c": "Slick / Comb / Part"}, {"n": "Comb Over Fade", "c": "Slick / Comb / Part"}, {"n": "Textured Comb Over", "c": "Slick / Comb / Part"}, {"n": "Low Taper Comb Over", "c": "Slick / Comb / Part"}, {"n": "Hard-Part Comb Over", "c": "Slick / Comb / Part"}, {"n": "Classic Side Part", "c": "Slick / Comb / Part"}, {"n": "Modern Side Part", "c": "Slick / Comb / Part"}, {"n": "Side Part Fade", "c": "Slick / Comb / Part"}, {"n": "Side Part Taper", "c": "Slick / Comb / Part"}, {"n": "Hard Part", "c": "Slick / Comb / Part"}, {"n": "Classic Undercut", "c": "Slick / Comb / Part"}, {"n": "Disconnected Undercut", "c": "Slick / Comb / Part"}, {"n": "Undercut Fade", "c": "Slick / Comb / Part"}, {"n": "Textured Undercut", "c": "Slick / Comb / Part"}, {"n": "Long Undercut", "c": "Slick / Comb / Part"}, {"n": "Korean Two-Block", "c": "Korean / Asian"}, {"n": "Two-Block Fade", "c": "Korean / Asian"}, {"n": "Textured Two-Block", "c": "Korean / Asian"}, {"n": "Comma Hair", "c": "Korean / Asian"}, {"n": "Korean Middle Part", "c": "Korean / Asian"}, {"n": "Korean Curtains", "c": "Korean / Asian"}, {"n": "Korean Side Part", "c": "Korean / Asian"}, {"n": "Korean Textured Crop", "c": "Korean / Asian"}, {"n": "Korean Fluffy Cut", "c": "Korean / Asian"}, {"n": "Korean Down-Perm Style", "c": "Korean / Asian"}, {"n": "Modern Mullet", "c": "Mullet / Wolf"}, {"n": "Taper Mullet", "c": "Mullet / Wolf"}, {"n": "Burst Fade Mullet", "c": "Mullet / Wolf"}, {"n": "Low Fade Mullet", "c": "Mullet / Wolf"}, {"n": "Textured Mullet", "c": "Mullet / Wolf"}, {"n": "Curly Mullet", "c": "Mullet / Wolf"}, {"n": "Short Mullet", "c": "Mullet / Wolf"}, {"n": "Long Mullet", "c": "Mullet / Wolf"}, {"n": "Shaggy Mullet", "c": "Mullet / Wolf"}, {"n": "Wolf Cut", "c": "Mullet / Wolf"}];
 function pageHaircutCatalog(){
-  return topbar("Haircut Styles", "100 hard-coded inspiration styles. Clients can browse them; these entries cannot be edited or deleted from this catalog.") + `
+  return topbar("Haircut Styles", "100 hard-coded inspiration styles. Names and categories are locked, but you can add a photo for each one — it shows on the public style page.") + `
     <div class="card" id="haircutCatalog">
       <div style="display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;">
         <div><h3 style="margin-bottom:5px;">100 Style Library</h3><div class="m2">Use these styles as inspiration. Add one to your service menu or add all 100 at once.</div></div>
         <button class="btn btn-solid btn-sm" id="addAllHaircuts"><span>Add All 100 to Services</span></button>
       </div>
-      <div class="list-row" style="margin-top:18px;"><div class="main"><b>Catalog protection</b><div class="m2">The 100 style definitions below are hard-coded. They have no edit or delete controls.</div></div><span class="pill confirmed">LOCKED</span></div>
-      <div id="haircutAdminList" style="margin-top:10px;">${HAIRCUT_CATALOG.map((h,i)=>`<div class="list-row"><div class="main"><b><span style="color:var(--accent);margin-right:8px;">${String(i+1).padStart(2,'0')}</span>${esc(h.n)}</b><div class="m2">${esc(h.c)}</div></div><div class="acts"><button class="btn btn-ghost btn-sm" data-add-haircut="${i}">Add to Services</button></div></div>`).join("")}</div>
+      <div class="list-row" style="margin-top:18px;"><div class="main"><b>Catalog protection</b><div class="m2">The 100 style definitions below are hard-coded. They have no edit or delete controls — only their photos can be changed.</div></div><span class="pill confirmed">LOCKED</span></div>
+      <div id="haircutAdminList" style="margin-top:10px;">${HAIRCUT_CATALOG.map((h,i)=>renderHaircutRow(h,i)).join("")}</div>
     </div>`;
+}
+function renderHaircutRow(h, i){
+  const img = DATA.haircutImages[i] || "";
+  return `<div class="list-row hair-row" data-hair-row="${i}">
+      <div class="hair-row-top">
+        <div class="hair-row-main">
+          <div class="hair-thumb">${img ? `<img src="${esc(img)}">` : "—"}</div>
+          <div class="main">
+            <b><span style="color:var(--accent);margin-right:8px;">${String(i+1).padStart(2,'0')}</span>${esc(h.n)}</b>
+            <div class="m2">${esc(h.c)}</div>
+          </div>
+        </div>
+        <div class="acts">
+          <button class="btn btn-ghost btn-sm" data-photo-toggle="${i}">${img ? "Change Photo" : "Add Photo"}</button>
+          <button class="btn btn-ghost btn-sm" data-add-haircut="${i}">Add to Services</button>
+        </div>
+      </div>
+      <div class="hair-photo-editor" id="hairPhotoEditor${i}">
+        <div class="row2">
+          <div class="field"><label for="hairUrl${i}">Image URL (or Google Drive link)</label><input id="hairUrl${i}" data-hair-url="${i}" placeholder="https://..."></div>
+          <div class="field"><label for="hairFile${i}">Or Upload From Device</label><input id="hairFile${i}" type="file" accept="image/*" data-hair-file="${i}"></div>
+        </div>
+        <div class="helptext" style="margin-top:8px;">Tip: paste a direct image link, a shared Google Drive link ("Anyone with the link"), or upload a photo from this device — it's resized automatically to keep the site fast.</div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn btn-solid btn-sm" data-hair-save="${i}"><span>Save Photo</span></button>
+          ${img ? `<button class="btn btn-ghost btn-sm" data-hair-remove="${i}">Remove Photo</button>` : ""}
+        </div>
+      </div>
+    </div>`;
+}
+function normalizeImageUrl(url){
+  url = url.trim();
+  if(!url.includes("drive.google.com")) return url;
+  const m = url.match(/\/file\/d\/([^/]+)/) || url.match(/[?&]id=([^&]+)/);
+  if(m && m[1]) return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w1000`;
+  return url;
 }
 
 /* ---- Services ---- */
@@ -954,9 +999,44 @@ function wireAdminPage(page){
       DATA.services.push({id:uid(), category:h.c, name:h.n, price:0, duration:30, desc:"Haircut inspiration style."});
       if(await persist()){ toast(h.n+" added to Services.","ok"); }
     };
+    const refreshHaircutList = ()=>{ $("#haircutAdminList").innerHTML = HAIRCUT_CATALOG.map((h,i)=>renderHaircutRow(h,i)).join(""); };
     $("#haircutAdminList").addEventListener("click", async e=>{
-      const b=e.target.closest("[data-add-haircut]"); if(!b)return;
-      await addOne(+b.dataset.addHaircut);
+      const add=e.target.closest("[data-add-haircut]");
+      if(add){ await addOne(+add.dataset.addHaircut); return; }
+
+      const toggle=e.target.closest("[data-photo-toggle]");
+      if(toggle){ $("#hairPhotoEditor"+toggle.dataset.photoToggle).classList.toggle("open"); return; }
+
+      const save=e.target.closest("[data-hair-save]");
+      if(save){
+        const idx = +save.dataset.hairSave;
+        const urlInput = $(`[data-hair-url="${idx}"]`);
+        const fileInput = $(`[data-hair-file="${idx}"]`);
+        const file = fileInput.files[0];
+        let url = urlInput.value.trim();
+        if(!file && !url){ toast("Add an image URL or upload a photo.","err"); return; }
+        save.disabled = true;
+        try{
+          url = file ? await resizeImageFile(file, 1000) : normalizeImageUrl(url);
+        }catch(err){ toast("Could not read that image.","err"); save.disabled = false; return; }
+        DATA.haircutImages[idx] = url;
+        const ok = await persist();
+        save.disabled = false;
+        if(!ok){ delete DATA.haircutImages[idx]; return; }
+        toast("Photo saved.","ok");
+        refreshHaircutList();
+        return;
+      }
+
+      const remove=e.target.closest("[data-hair-remove]");
+      if(remove){
+        const idx = +remove.dataset.hairRemove;
+        const prev = DATA.haircutImages[idx];
+        delete DATA.haircutImages[idx];
+        if(await persist()){ toast("Photo removed.","ok"); refreshHaircutList(); }
+        else{ DATA.haircutImages[idx] = prev; }
+        return;
+      }
     });
     $("#addAllHaircuts").onclick=async()=>{
       let added=0;
