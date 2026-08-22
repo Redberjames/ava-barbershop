@@ -220,6 +220,61 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(max-width:980px){.admin-side{box-shadow:none}.admin-nav{display:flex;overflow-x:auto;gap:6px;padding-bottom:6px}.admin-nav a{white-space:nowrap;border-left:0;border-bottom:2px solid transparent}.admin-nav a.active{border-bottom-color:var(--gold);box-shadow:none}}
 @media(prefers-reduced-motion:reduce){.admin-nav a,.stat-card,.card{transition:none!important}}
 
+/* ---- Operating Hours: single-line premium schedule ---- */
+.hours-table{ display:flex; flex-direction:column; gap:10px; }
+.hrow{
+  display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+  padding:16px 20px; background:var(--bg-2); border:1px solid var(--line-soft);
+  border-radius:12px; transition:border-color .3s var(--ease), background .3s var(--ease);
+}
+.hrow:hover{ border-color:var(--line); }
+.hrow.is-closed{ background:rgba(255,255,255,.012); }
+.hrow-day{ display:flex; align-items:center; gap:12px; min-width:150px; flex-shrink:0; }
+.hrow-daylabel{ font-family:'Bebas Neue',sans-serif; letter-spacing:.05em; font-size:16px; color:var(--ink); width:44px; }
+.hrow.is-closed .hrow-daylabel{ color:var(--ink-faint); }
+.hrow-daystatus{ font-size:10px; letter-spacing:.1em; text-transform:uppercase; min-width:42px; transition:color .25s var(--ease); }
+.hrow.is-closed .hrow-daystatus{ color:var(--danger); }
+.hrow:not(.is-closed) .hrow-daystatus{ color:var(--success); }
+
+.switch{ position:relative; display:inline-flex; align-items:center; cursor:pointer; flex-shrink:0; }
+.switch input{ position:absolute; opacity:0; width:0; height:0; }
+.switch-track{ width:38px; height:22px; border-radius:20px; background:var(--bg); border:1px solid var(--line); position:relative; display:block; transition:background .25s var(--ease), border-color .25s var(--ease); }
+.switch-thumb{ position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%; background:var(--ink-faint); transition:transform .25s var(--ease), background .25s var(--ease); }
+.switch input:checked + .switch-track{ background:rgba(201,162,76,.16); border-color:var(--accent); }
+.switch input:checked + .switch-track .switch-thumb{ transform:translateX(16px); background:var(--accent); }
+.switch input:disabled + .switch-track{ opacity:.35; cursor:not-allowed; }
+.switch.switch-sm .switch-track{ width:30px; height:18px; }
+.switch.switch-sm .switch-thumb{ width:12px; height:12px; }
+.switch.switch-sm input:checked + .switch-track .switch-thumb{ transform:translateX(12px); }
+
+.hrow-times{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.hrow-sep{ color:var(--ink-faint); font-size:12px; }
+.hrow-divider{ width:1px; align-self:stretch; background:var(--line-soft); flex-shrink:0; min-height:26px; }
+.hrow-break{ display:flex; align-items:center; gap:10px; flex-shrink:0; opacity:1; transition:opacity .3s var(--ease); }
+.hrow-break.off{ opacity:.4; }
+.hrow-breaklabel{ font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-faint); white-space:nowrap; }
+
+.hrow input[type=time]{
+  background:var(--bg); border:1px solid var(--line); color:var(--ink);
+  padding:9px 10px; border-radius:6px; font-size:13px; outline:none; width:108px;
+  transition:border-color .25s var(--ease), box-shadow .25s var(--ease), opacity .25s var(--ease);
+}
+.hrow-break input[type=time]{ width:96px; }
+.hrow input[type=time]:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(201,162,76,.08); }
+.hrow input[type=time]:disabled{ opacity:.35; cursor:not-allowed; }
+
+@media(max-width:900px){
+  .hrow{ gap:14px; }
+  .hrow-divider{ display:none; }
+  .hrow-day{ min-width:120px; }
+}
+@media(max-width:640px){
+  .hrow{ flex-direction:column; align-items:stretch; gap:12px; padding:16px; }
+  .hrow-day{ justify-content:space-between; width:100%; }
+  .hrow-times, .hrow-break{ width:100%; justify-content:space-between; }
+  .hrow-times input[type=time], .hrow-break input[type=time]{ flex:1; width:auto; }
+}
+
 </style>
 </head>
 <body>
@@ -858,27 +913,40 @@ function pageHours(){
   return topbar("Operating Hours", "Set opening and closing times for each day.") + `
     <div class="card">
       <h3>Weekly Schedule</h3>
-      <div class="admin-form">
+      <div class="hours-table">
         ${DOW.map(d=>{
           const h = DATA.hours[d];
           const lunchOn = !!h.lunchEnabled;
-          return `<div class="row3" style="align-items:end;">
-            <div class="field"><label>${DOW_LABEL[d]}</label>
-              <select id="h_closed_${d}"><option value="0" ${!h.closed?'selected':''}>Open</option><option value="1" ${h.closed?'selected':''}>Closed</option></select>
+          const closed = !!h.closed;
+          return `<div class="hrow ${closed?'is-closed':''}" data-day="${d}">
+            <div class="hrow-day">
+              <span class="hrow-daylabel">${DOW_LABEL[d]}</span>
+              <label class="switch">
+                <input type="checkbox" id="h_closed_${d}" ${!closed?'checked':''}>
+                <span class="switch-track"><span class="switch-thumb"></span></span>
+              </label>
+              <span class="hrow-daystatus" id="h_status_${d}">${closed?'Closed':'Open'}</span>
             </div>
-            <div class="field"><label>Opens</label><input type="time" id="h_open_${d}" value="${h.open}" ${h.closed?'disabled':''}></div>
-            <div class="field"><label>Closes</label><input type="time" id="h_close_${d}" value="${h.close}" ${h.closed?'disabled':''}></div>
-          </div>
-          <div class="row3" style="align-items:end; margin-top:6px; margin-bottom:18px;">
-            <div class="field"><label>Lunch Break</label>
-              <select id="h_lunch_on_${d}" ${h.closed?'disabled':''}><option value="0" ${!lunchOn?'selected':''}>No break</option><option value="1" ${lunchOn?'selected':''}>Scheduled</option></select>
+            <div class="hrow-times">
+              <input type="time" id="h_open_${d}" value="${h.open}" ${closed?'disabled':''}>
+              <span class="hrow-sep">–</span>
+              <input type="time" id="h_close_${d}" value="${h.close}" ${closed?'disabled':''}>
             </div>
-            <div class="field"><label>Break Starts</label><input type="time" id="h_lunch_start_${d}" value="${h.lunchStart||'12:00'}" ${(!lunchOn||h.closed)?'disabled':''}></div>
-            <div class="field"><label>Break Ends</label><input type="time" id="h_lunch_end_${d}" value="${h.lunchEnd||'13:00'}" ${(!lunchOn||h.closed)?'disabled':''}></div>
+            <div class="hrow-divider"></div>
+            <div class="hrow-break ${lunchOn?'':'off'}" id="h_breakwrap_${d}">
+              <label class="switch switch-sm">
+                <input type="checkbox" id="h_lunch_on_${d}" ${lunchOn?'checked':''} ${closed?'disabled':''}>
+                <span class="switch-track"><span class="switch-thumb"></span></span>
+              </label>
+              <span class="hrow-breaklabel">Break</span>
+              <input type="time" id="h_lunch_start_${d}" value="${h.lunchStart||'12:00'}" ${(!lunchOn||closed)?'disabled':''}>
+              <span class="hrow-sep">–</span>
+              <input type="time" id="h_lunch_end_${d}" value="${h.lunchEnd||'13:00'}" ${(!lunchOn||closed)?'disabled':''}>
+            </div>
           </div>`;
         }).join("")}
-        <div class="field" style="max-width:220px;"><label for="h_slot">Slot Length (minutes)</label><input type="number" id="h_slot" min="10" step="5" value="${DATA.slotMinutes}"></div>
       </div>
+      <div class="field" style="max-width:220px; margin-top:20px;"><label for="h_slot">Slot Length (minutes)</label><input type="number" id="h_slot" min="10" step="5" value="${DATA.slotMinutes}"></div>
       <button class="btn btn-solid btn-sm" id="saveHours" style="margin-top:16px;"><span>Save Hours</span></button>
     </div>`;
 }
@@ -1277,23 +1345,27 @@ function wireAdminPage(page){
   if(page==="hours"){
     DOW.forEach(d=>{
       $("#h_closed_"+d).addEventListener("change", e=>{
-        const closed = e.target.value==="1";
-        $("#h_open_"+d).disabled = closed; $("#h_close_"+d).disabled = closed;
-        $("#h_lunch_on_"+d).disabled = closed;
-        const lunchOn = $("#h_lunch_on_"+d).value==="1";
-        $("#h_lunch_start_"+d).disabled = closed || !lunchOn;
-        $("#h_lunch_end_"+d).disabled = closed || !lunchOn;
+        const open = e.target.checked;
+        const row = e.target.closest(".hrow");
+        row.classList.toggle("is-closed", !open);
+        $("#h_status_"+d).textContent = open ? "Open" : "Closed";
+        $("#h_open_"+d).disabled = !open; $("#h_close_"+d).disabled = !open;
+        $("#h_lunch_on_"+d).disabled = !open;
+        const lunchOn = $("#h_lunch_on_"+d).checked;
+        $("#h_lunch_start_"+d).disabled = !open || !lunchOn;
+        $("#h_lunch_end_"+d).disabled = !open || !lunchOn;
       });
       $("#h_lunch_on_"+d).addEventListener("change", e=>{
-        const lunchOn = e.target.value==="1";
+        const lunchOn = e.target.checked;
+        $("#h_breakwrap_"+d).classList.toggle("off", !lunchOn);
         $("#h_lunch_start_"+d).disabled = !lunchOn; $("#h_lunch_end_"+d).disabled = !lunchOn;
       });
     });
     $("#saveHours").onclick = async ()=>{
       DOW.forEach(d=>{
         DATA.hours[d] = {
-          open:$("#h_open_"+d).value, close:$("#h_close_"+d).value, closed: $("#h_closed_"+d).value==="1",
-          lunchEnabled: $("#h_lunch_on_"+d).value==="1",
+          open:$("#h_open_"+d).value, close:$("#h_close_"+d).value, closed: !$("#h_closed_"+d).checked,
+          lunchEnabled: $("#h_lunch_on_"+d).checked,
           lunchStart: $("#h_lunch_start_"+d).value,
           lunchEnd: $("#h_lunch_end_"+d).value
         };
