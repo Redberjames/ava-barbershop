@@ -406,6 +406,12 @@ img{max-width:100%; display:block;}
 @media(max-width:980px){.review-grid{grid-template-columns:1fr}.review-form{position:relative;top:auto}.top-reviews-head{align-items:flex-start;flex-direction:column}.top-reviews-head .rating-summary{justify-content:flex-start}}
 @media(max-width:640px){.review-grid{gap:18px}.review-form{padding:20px}.testi-card{padding:22px}.top-reviews-head{gap:14px}.top-reviews-head .rating-summary{flex-wrap:wrap}}
 
+/* ================= MOBILE-FIRST APPOINTMENT EXPERIENCE ================= */
+.appointment-card{margin-top:18px;border:1px solid rgba(238,203,122,.18);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.015));border-radius:16px;padding:16px;box-shadow:0 16px 42px rgba(0,0,0,.22)}
+.appointment-card .ac-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}.appointment-card .ac-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em}.appointment-card .ac-ref{font-size:9px;letter-spacing:.16em;color:var(--ink-faint);text-transform:uppercase;margin-top:3px}.appointment-card .ac-status{font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:7px 9px;border-radius:999px;border:1px solid rgba(201,162,76,.28);color:var(--gold-2);white-space:nowrap}.appointment-card .ac-status.pending{color:var(--ink-faint);border-color:var(--line-soft)}.appointment-card .ac-status.cancelled{color:#d98c8c;border-color:rgba(217,140,140,.25)}
+.ac-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.ac-item{padding:11px 12px;border:1px solid var(--line-soft);border-radius:11px;background:rgba(0,0,0,.12)}.ac-item .k{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:5px}.ac-item .v{font-size:12px;line-height:1.35}.ac-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.ac-actions .btn{min-height:42px}.ac-cancel-note{font-size:10px;color:var(--ink-faint);line-height:1.5;margin-top:10px}.ac-cancel-note strong{color:var(--ink)}
+.booking-modal{position:fixed;inset:0;z-index:120;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);padding:14px}.booking-modal.show{display:flex}.booking-modal .modal-card{width:min(100%,520px);max-height:90vh;overflow:auto;background:#11100d;border:1px solid rgba(238,203,122,.2);border-radius:18px 18px 12px 12px;padding:20px;box-shadow:0 24px 80px rgba(0,0,0,.55)}.booking-modal h3{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em;margin:0 0 6px}.booking-modal .modal-sub{font-size:11px;color:var(--ink-faint);line-height:1.5;margin-bottom:16px}.booking-modal .modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.booking-modal .danger{border-color:rgba(217,140,140,.35);color:#e2a0a0}.receipt-sheet{position:fixed;left:-100000px;top:0;width:390px;background:#11100d;color:#f4efe4;padding:26px;font-family:Jost,Arial,sans-serif}.receipt-sheet .rs-logo{display:block;width:110px;height:110px;object-fit:contain;margin:0 auto 14px}.receipt-sheet .rs-eyebrow{font-size:9px;letter-spacing:.2em;text-align:center;color:#eecb7a;text-transform:uppercase}.receipt-sheet .rs-title{text-align:center;font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.05em;margin:5px 0}.receipt-sheet .rs-ref{text-align:center;font-size:10px;letter-spacing:.18em;color:#aaa;text-transform:uppercase;margin-bottom:22px}.receipt-sheet .rs-status{text-align:center;border:1px solid rgba(238,203,122,.35);padding:9px;border-radius:10px;color:#eecb7a;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:18px}.receipt-sheet .rs-section{border-top:1px solid rgba(255,255,255,.12);padding-top:14px;margin-top:14px}.receipt-sheet .rs-label{font-size:8px;letter-spacing:.18em;color:#999;text-transform:uppercase;margin-bottom:6px}.receipt-sheet .rs-value{font-size:13px;line-height:1.5}.receipt-sheet .rs-footer{text-align:center;color:#888;font-size:9px;line-height:1.6;margin-top:24px}.receipt-sheet .rs-qr{margin:18px auto 0;width:120px;height:120px;border:1px solid rgba(255,255,255,.1);padding:5px}
+@media(max-width:640px){.ac-grid{grid-template-columns:1fr}.ac-actions{grid-template-columns:1fr}.appointment-card{padding:14px}.booking-modal{padding:0}.booking-modal .modal-card{border-radius:18px 18px 0 0;padding:18px}}
 /* ================= PREMIUM V2 UX POLISH ================= */
 :root{--premium-border:rgba(238,203,122,.18);--premium-glow:rgba(201,162,76,.12);--premium-surface:rgba(255,255,255,.025)}
 body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),transparent 38%)}
@@ -677,7 +683,29 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
     <a class="fab-btn" id="waFab" href="#" target="_blank" title="Chat on WhatsApp">💬</a>
   </div>
 
-  <div id="lightbox">
+  <div class="booking-modal" id="bookingModal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="bookingModalTitle">
+    <h3 id="bookingModalTitle">Manage Appointment</h3>
+    <div class="modal-sub" id="bookingModalSub"></div>
+    <div id="bookingModalBody"></div>
+    <div class="modal-actions">
+      <button class="btn" id="bookingModalClose">Keep Appointment</button>
+      <button class="btn danger" id="bookingModalCancel">Cancel Appointment</button>
+    </div>
+  </div>
+</div>
+<div class="receipt-sheet" id="receiptSheet">
+  <img class="rs-logo" id="receiptLogo" alt="Shop logo">
+  <div class="rs-eyebrow" id="receiptShopName"></div>
+  <div class="rs-title">Appointment Confirmation</div>
+  <div class="rs-ref" id="receiptRef"></div>
+  <div class="rs-status">Appointment Confirmed</div>
+  <div class="rs-section"><div class="rs-label">Client</div><div class="rs-value" id="receiptClient"></div></div>
+  <div class="rs-section"><div class="rs-label">Appointment</div><div class="rs-value" id="receiptAppointment"></div></div>
+  <div class="rs-section"><div class="rs-label">Location</div><div class="rs-value" id="receiptLocation"></div></div>
+  <div class="rs-footer">Please arrive 5–10 minutes early.<br>Keep this confirmation for your records.</div>
+</div>
+<div id="lightbox">
     <button class="lb-close" id="lbClose">CLOSE ✕</button>
     <img id="lbImg" src="">
     <div class="lb-cap" id="lbCap"></div>
@@ -685,6 +713,7 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 /* ==========================================================================================
    AVA BARBERSHOP — single-file app. Client site + password-protected Admin CMS.
@@ -766,6 +795,7 @@ function defaultData(){
     },
     slotMinutes:30,
     bookingMode:"manual",
+    cancellationNoticeHours:2,
     gallery:[
       {id:uid(), url:"https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=900&auto=format&fit=crop", caption:"Skin fade, freshly cleaned up"},
       {id:uid(), url:"https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=900&auto=format&fit=crop", caption:"Hot towel shave ritual"},
@@ -819,6 +849,7 @@ async function loadData(){
    review-approval flow existed are treated as already-approved admin picks). */
 function normalizeData(d){
   d.bookingMode = d.bookingMode === "auto" ? "auto" : "manual";
+  d.cancellationNoticeHours = Number.isFinite(+d.cancellationNoticeHours) ? Math.max(0, +d.cancellationNoticeHours) : 2;
   d.testimonials = (d.testimonials||[]).map(t=> Object.assign({ date: fmtDateKey(new Date()), approved:true, source:"admin" }, t));
   return d;
 }
@@ -1082,7 +1113,12 @@ function initCalendar(){
   renderCal();
   $("#bkSubmit").onclick = submitBooking;
   $("#bkService").addEventListener("change", ()=>{ selectedSlot = null; renderCal(); });
+  $("#bookingModalClose").addEventListener("click", closeBookingModal);
+  $("#bookingModal").addEventListener("click", e=>{ if(e.target.id==="bookingModal") closeBookingModal(); });
+  $("#bookingModalCancel").addEventListener("click", async e=>{ const b=DATA.bookings.find(x=>x.id===e.currentTarget.dataset.bookingId); if(b) await cancelBooking(b); });
+  $("#myBookingsWrap").addEventListener("click", async e=>{ const r=e.target.closest('[data-receipt]'); if(r){const b=DATA.bookings.find(x=>x.id===r.dataset.receipt); if(b) await downloadBookingReceipt(b); return;} const m=e.target.closest('[data-manage]'); if(m){const b=DATA.bookings.find(x=>x.id===m.dataset.manage); if(b) openBookingModal(b);} });
 }
+
 
 function bookingsForDate(dateKey){
   return DATA.bookings.filter(b=> b.date===dateKey && b.status!=="cancelled");
@@ -1243,13 +1279,68 @@ async function submitBooking(){
   renderCal(); renderMyBookings();
 }
 
+function bookingRef(b){
+  const raw=String(b.id||'').replace(/[^a-z0-9]/gi,'').toUpperCase();
+  let h=2166136261; for(let i=0;i<raw.length;i++){ h^=raw.charCodeAt(i); h=Math.imul(h,16777619); }
+  return 'AVA-'+(h>>>0).toString(36).toUpperCase().padStart(6,'0').slice(-6);
+}
+function bookingDateTime(b){
+  const d=parseDateKey(b.date); const [h,m]=b.time.split(':').map(Number); d.setHours(h,m,0,0); return d;
+}
+function canCancelBooking(b){
+  if(b.status!=='confirmed' && b.status!=='pending') return false;
+  const notice=Math.max(0,+DATA.cancellationNoticeHours||0);
+  return bookingDateTime(b).getTime()-Date.now() >= notice*3600000;
+}
+function openBookingModal(b){
+  const modal=$('#bookingModal'); if(!modal)return;
+  $('#bookingModalSub').textContent=`${fmtDisplayDate(b.date)} · ${fmtTime12(b.time)} · ${esc(b.serviceName)} · Ref ${bookingRef(b)}`;
+  const cancelable=canCancelBooking(b);
+  $('#bookingModalBody').innerHTML=`<div class="appointment-card" style="margin-top:0"><div class="ac-top"><div><div class="ac-title">${esc(b.serviceName)}</div><div class="ac-ref">${esc(bookingRef(b))}</div></div><span class="ac-status ${b.status}">${esc(b.status)}</span></div><div class="ac-grid"><div class="ac-item"><div class="k">Date</div><div class="v">${fmtDisplayDate(b.date)}</div></div><div class="ac-item"><div class="k">Time</div><div class="v">${fmtTime12(b.time)}</div></div><div class="ac-item"><div class="k">Client</div><div class="v">${esc(b.name)}</div></div><div class="ac-item"><div class="k">Phone</div><div class="v">${esc(b.phone)}</div></div></div></div>`;
+  const cancelBtn=$('#bookingModalCancel'); cancelBtn.disabled=!cancelable; cancelBtn.textContent=cancelable?'Cancel Appointment':'Cancellation Unavailable';
+  cancelBtn.dataset.bookingId=b.id;
+  const note=cancelable?`You can cancel this appointment up to ${Math.max(0,+DATA.cancellationNoticeHours||0)} hour(s) before the scheduled time.`:`Online cancellation is no longer available for this appointment. Please contact the shop directly.`;
+  $('#bookingModalBody').insertAdjacentHTML('beforeend',`<div class="ac-cancel-note">${note}</div>`);
+  modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+}
+function closeBookingModal(){ const m=$('#bookingModal'); if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true');} }
+async function downloadBookingReceipt(b){
+  if(!b || b.status!=='confirmed'){ toast('The appointment must be confirmed before downloading its confirmation.','err'); return; }
+  const logo=$('#receiptLogo'); logo.src=$('.hero-art .logo-3d')?.src || '';
+  $('#receiptShopName').textContent=DATA.meta.name||'Ava Barbershop';
+  $('#receiptRef').textContent=bookingRef(b);
+  $('#receiptClient').innerHTML=`${esc(b.name)}<br>${esc(b.phone)}`;
+  const svc=DATA.services.find(s=>s.id===b.serviceId); const duration=b.duration||svc?.duration||DATA.slotMinutes||30;
+  $('#receiptAppointment').innerHTML=`${esc(b.serviceName)}<br>${esc(fmtDisplayDate(b.date))}<br><strong>${esc(fmtTime12(b.time))}</strong><br>${duration} minutes`;
+  $('#receiptLocation').textContent=DATA.wordings.address||'Ava Barbershop';
+  const sheet=$('#receiptSheet');
+  try{
+    if(window.html2pdf){ await window.html2pdf().set({margin:0.18,filename:`${bookingRef(b)}-appointment-confirmation.pdf`,image:{type:'jpeg',quality:.96},html2canvas:{scale:2,useCORS:true,backgroundColor:'#11100d'},jsPDF:{unit:'in',format:[4.1,6.7],orientation:'portrait'}}).from(sheet).save(); }
+    else { const w=window.open('','_blank'); if(!w){toast('Please allow pop-ups to print your confirmation.','err');return;} w.document.write('<html><head><title>Appointment Confirmation</title></head><body>'+sheet.outerHTML+'</body></html>'); w.document.close(); w.focus(); setTimeout(()=>w.print(),400); }
+  }catch(e){ console.error(e); toast('Could not create the confirmation. Please try again.','err'); }
+}
+async function cancelBooking(b){
+  if(!b || !canCancelBooking(b)){ toast('This appointment can no longer be cancelled online.','err'); return; }
+  const phone=prompt('For security, enter the phone number used for this booking:');
+  if(phone===null)return;
+  if(!phone.trim()){toast('Phone number is required.','err');return;}
+  const {data,error}=await sb.rpc('cancel_booking',{p_booking_id:String(b.id),p_phone:phone.trim()});
+  if(error){console.error('cancel_booking failed',error);toast(error.message||'Could not cancel the appointment.','err');return;}
+  DATA.bookings=DATA.bookings.map(x=>x.id===b.id?Object.assign({},x,{status:'cancelled'}):x);
+  await saveMyBookings((await loadMyBookings()).filter(x=>x.id!==b.id));
+  closeBookingModal(); renderCal(); await renderMyBookings(); toast('Your appointment has been cancelled.','ok');
+}
 async function renderMyBookings(){
   const mine=(await loadMyBookings()).sort((a,b)=>b.createdAt-a.createdAt);
-  const fresh=mine.map(m=>{ const src=DATA.bookings.find(b=>b.id===m.id); if(!src || src.status==="cancelled") return null; return Object.assign({},m,{status:src.status}); }).filter(Boolean);
+  const fresh=mine.map(m=>{ const src=DATA.bookings.find(b=>b.id===m.id); if(!src || src.status==='cancelled') return null; return Object.assign({},m,{status:src.status}); }).filter(Boolean);
   await saveMyBookings(fresh);
-  if(!fresh.length){ $("#myBookingsWrap").innerHTML=""; return; }
-  $("#myBookingsWrap").innerHTML=`<h4 style="font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:6px;">Your Bookings</h4>`+
-    fresh.slice(0,5).map(b=>`<div class="mb-item"><span>${fmtDisplayDate(b.date)} · ${fmtTime12(b.time)} · ${esc(b.serviceName)}</span><span class="st ${b.status}">${b.status}</span></div>`).join("");
+  if(!fresh.length){ $('#myBookingsWrap').innerHTML=''; return; }
+  $('#myBookingsWrap').innerHTML=`<h4 style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px;">Your Bookings</h4>`+fresh.slice(0,5).map(b=>{
+    const confirmed=b.status==='confirmed'; const cancelable=canCancelBooking(b);
+    const receiptBtn=confirmed?'<button class="btn btn-solid" data-receipt="'+esc(b.id)+'">Download Confirmation</button>':'';
+    const note=b.status==='pending'?'<div class="ac-cancel-note">Your request is awaiting confirmation. The confirmation download becomes available once the shop accepts it.</div>':(!cancelable?'<div class="ac-cancel-note">Online cancellation is unavailable within the shop\'s cancellation window.</div>':'');
+    return `<div class="appointment-card"><div class="ac-top"><div><div class="ac-title">${esc(b.serviceName)}</div><div class="ac-ref">Ref ${esc(bookingRef(b))}</div></div><span class="ac-status ${b.status}">${esc(b.status)}</span></div><div class="ac-grid"><div class="ac-item"><div class="k">Date</div><div class="v">${fmtDisplayDate(b.date)}</div></div><div class="ac-item"><div class="k">Time</div><div class="v">${fmtTime12(b.time)}</div></div></div><div class="ac-actions">${receiptBtn}<button class="btn" data-manage="${esc(b.id)}">Manage Appointment</button></div>${note}</div>`;
+  }).join('');
 }
 
 async function syncClientBookings(){ const before=JSON.stringify(DATA.bookings); await refreshArray("bookings"); if(JSON.stringify(DATA.bookings)!==before){ renderCal(); await renderMyBookings(); } }

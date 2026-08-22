@@ -837,7 +837,7 @@ function renderTestiList(list, isPending){
 /* ---- Settings ---- */
 function pageSettings(){
   const auto = DATA.bookingMode === "auto";
-  return topbar("Settings", "Password, booking approval, brand color, and shop preferences.") + `
+  return topbar("Settings", "Password, booking approval, cancellation policy, brand color, and shop preferences.") + `
     <div class="card">
       <h3>Booking Approval</h3>
       <div class="admin-form">
@@ -851,6 +851,19 @@ function pageSettings(){
       </div>
       <div class="helptext" style="margin-top:10px;">${auto ? "Auto accept is ON. New valid bookings are confirmed immediately, so the manual Confirm action is disabled." : "Manual approval is ON. New bookings stay Pending until you confirm or cancel them."} Cancelled bookings still release their time slot.</div>
       <button class="btn btn-solid btn-sm" id="saveBookingMode" style="margin-top:14px;"><span>Save Booking Setting</span></button>
+    </div>
+    <div class="card">
+      <h3>Client Cancellation</h3>
+      <div class="admin-form">
+        <div class="field">
+          <label for="cancellationNoticeHours">Minimum notice before appointment</label>
+          <select id="cancellationNoticeHours">
+            ${[0,1,2,4,12,24].map(h=>`<option value="${h}" ${(+DATA.cancellationNoticeHours||0)===h?'selected':''}>${h===0?'Anytime':h+' hour'+(h===1?'':'s')+' before'}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="helptext" style="margin-top:10px;">Clients can cancel confirmed or pending appointments online until this window begins. The database also enforces the same rule.</div>
+      <button class="btn btn-solid btn-sm" id="saveCancellationPolicy" style="margin-top:14px;"><span>Save Cancellation Policy</span></button>
     </div>
     <div class="card">
       <h3>Accent Color</h3>
