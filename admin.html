@@ -383,8 +383,7 @@ function defaultData(){
       {id:uid(), name:"Diego T.", stars:5, text:"Walked in stressed, walked out feeling like a new man. Ava Barbershop gets it.", date:fmtDateKey(new Date()), approved:true, source:"admin"},
       {id:uid(), name:"Liam S.", stars:5, text:"Hot towel shave is unreal. Booking the calendar was so easy too.", date:fmtDateKey(new Date()), approved:true, source:"admin"}
     ],
-    bookings:[],
-    passwordHash:null
+    bookings:[]
   };
 }
 
@@ -1063,6 +1062,7 @@ function pageSettings(){
     </div>
     <div class="card">
       <h3>Change Admin Password</h3>
+      <div class="helptext" style="margin-top:-4px; margin-bottom:14px;">This updates the password for your current login. You'll keep using the same email to sign in — only the password changes.</div>
       <div class="admin-form">
         <div class="row2">
           <div class="field"><label for="np1">New Password</label><input type="password" id="np1" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
@@ -1407,8 +1407,11 @@ function wireAdminPage(page){
       const p1 = $("#np1").value, p2 = $("#np2").value;
       if(p1.length<6){ toast("Password must be at least 6 characters.","err"); return; }
       if(p1!==p2){ toast("Passwords do not match.","err"); return; }
-      DATA.passwordHash = await sha256(p1);
-      if(await persist()){ toast("Password updated.","ok"); $("#np1").value=""; $("#np2").value=""; }
+      const btn = $("#changePw"); btn.disabled = true;
+      const { error } = await sb.auth.updateUser({ password: p1 });
+      btn.disabled = false;
+      if(error){ toast(error.message || "Could not update password.", "err"); return; }
+      toast("Password updated.","ok"); $("#np1").value=""; $("#np2").value="";
     };
   }
 }
