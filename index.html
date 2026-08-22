@@ -783,7 +783,6 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 /* ==========================================================================================
    AVA BARBERSHOP — single-file app. Client site + password-protected Admin CMS.
@@ -1450,27 +1449,7 @@ function openBookingModal(b){
 function closeBookingModal(){ const m=$('#bookingModal'); if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true');} }
 async function downloadBookingReceipt(b){
   if(!b || b.status!=='confirmed'){ toast('The appointment must be confirmed before downloading its confirmation.','err'); return; }
-  const logo=$('#receiptLogo');
-  // Load the logo as an actual data: URI rather than pointing at the live file.
-  // html2canvas treats network-loaded images as cross-origin resources and can
-  // silently produce a "tainted" canvas (toBlob returns null) even for same-site
-  // images — embedding the bytes directly sidesteps that entirely.
-  try{
-    const heroLogo = $('.hero-art .logo-3d');
-    const src = heroLogo ? (heroLogo.currentSrc || heroLogo.src) : '';
-    if(src){
-      const resp = await fetch(src);
-      const blob = await resp.blob();
-      logo.src = await new Promise((resolve, reject)=>{
-        const reader = new FileReader();
-        reader.onload = ()=> resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    } else {
-      logo.src = '';
-    }
-  }catch(_){ logo.src = ''; }
+  const logo=$('#receiptLogo'); logo.src=$('.hero-art .logo-3d')?.src || $('.brand img')?.src || '';
   $('#receiptShopName').textContent=DATA.meta.name||'Ava Barbershop';
   $('#receiptRef').textContent=bookingRef(b);
   $('#receiptClient').innerHTML=`${esc(b.name)}<br>${esc(b.phone)}`;
@@ -1478,42 +1457,33 @@ async function downloadBookingReceipt(b){
   $('#receiptAppointment').innerHTML=`${esc(b.serviceName)}<br>${esc(fmtDisplayDate(b.date))}<br><strong>${esc(fmtTime12(b.time))}</strong><br>${duration} minutes`;
   $('#receiptLocation').textContent=DATA.wordings.address||'Ava Barbershop';
   const sheet=$('#receiptSheet');
-  const previous={position:sheet.style.position,left:sheet.style.left,top:sheet.style.top,zIndex:sheet.style.zIndex,opacity:sheet.style.opacity,pointerEvents:sheet.style.pointerEvents};
   try{
-    // html2canvas cannot reliably capture an element positioned far outside the viewport.
-    // Temporarily place the receipt on-canvas while generating, then restore it.
-    // z-index must be ABOVE every other layer (grain/vignette/modals use up to 99999) or the
-    // sheet renders invisibly behind the page's opaque content and html2canvas captures a blank page.
-    sheet.style.position='fixed'; sheet.style.left='0'; sheet.style.top='0'; sheet.style.zIndex='100000'; sheet.style.opacity='1'; sheet.style.pointerEvents='none';
-    if(logo.src && logo.decode) { try{ await logo.decode(); }catch(_){} }
-    // The sheet was just moved on-canvas and its logo/fonts may not be painted yet.
-    // Wait for web fonts to finish loading, then give the browser two animation frames
-    // to actually paint the layout — otherwise html2canvas can snapshot a blank/half-drawn sheet.
-    if(document.fonts && document.fonts.ready){ try{ await document.fonts.ready; }catch(_){} }
-    await new Promise(r=> requestAnimationFrame(()=> requestAnimationFrame(r)));
-    if(window.html2pdf){
-      // Export as PNG rather than PDF: this is a compact receipt card, not a multi-page
-      // document, so a PNG is simpler, more reliable across browsers, and easier to
-      // share/print than a PDF for something this size.
-      const canvas = await window.html2pdf().set({image:{type:'png',quality:1},html2canvas:{scale:2,useCORS:true,backgroundColor:'#11100d',logging:false}}).from(sheet).toCanvas().get('canvas');
-      // Use toBlob() rather than toDataURL(): a data-URI download can get mishandled
-      // (truncated or saved as raw text) by mobile browsers, producing a corrupted file.
-      // A real Blob + object URL downloads as actual binary PNG bytes everywhere.
-      const blob = await new Promise(resolve=> canvas.toBlob(resolve, 'image/png', 1));
-      if(!blob) throw new Error('Canvas produced no image data.');
-      const url = URL.createObjectURL(blob);
-      const link=document.createElement('a');
-      link.download=`${bookingRef(b)}-appointment-confirmation.png`;
-      link.href=url;
-      document.body.appendChild(link); link.click(); link.remove();
-      setTimeout(()=> URL.revokeObjectURL(url), 4000);
-    } else {
-      const w=window.open('','_blank'); if(!w){toast('Please allow pop-ups to print your confirmation.','err');return;}
-      w.document.write('<html><head><title>Appointment Confirmation</title><style>body{margin:0;background:#11100d;color:#f4efe4;font-family:Arial,sans-serif}*{box-sizing:border-box}</style></head><body>'+sheet.outerHTML+'</body></html>'); w.document.close(); w.focus(); setTimeout(()=>w.print(),500);
-    }
-    toast('Your appointment confirmation is ready.','ok');
+    // Rendering this to a canvas (html2canvas/html2pdf) proved unreliable across mobile
+    // browsers — blank captures, tainted-canvas failures, corrupted downloads. Opening a
+    // real, styled printable page and using the browser's own print/share dialog avoids
+    // all of that: it's just normal DOM rendering, which every browser handles consistently,
+    // and gives the visitor "Save as PDF" / share-to-Photos for free.
+    const w=window.open('','_blank');
+    if(!w){ toast('Please allow pop-ups to open your confirmation.','err'); return; }
+    const styleTag = document.querySelector('style');
+    const css = styleTag ? styleTag.innerHTML : '';
+    w.document.open();
+    w.document.write(`<!doctype html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${esc(bookingRef(b))} — Appointment Confirmation</title>
+<style>${css}
+html,body{margin:0;background:#11100d;display:flex;justify-content:center;padding:28px 14px}
+.receipt-sheet{position:static !important;left:auto !important;opacity:1 !important;pointer-events:auto !important;box-shadow:0 10px 40px rgba(0,0,0,.4);border-radius:14px}
+@media print{ html,body{padding:0;background:#fff} .receipt-sheet{box-shadow:none} }
+</style></head><body>${sheet.outerHTML}</body></html>`);
+    w.document.close();
+    const finish=()=>{ w.focus(); setTimeout(()=> w.print(), 250); };
+    const wImg = w.document.querySelector('.rs-logo');
+    if(wImg && wImg.getAttribute('src')){
+      if(wImg.complete) finish();
+      else { wImg.addEventListener('load', finish); wImg.addEventListener('error', finish); }
+    } else { finish(); }
+    toast('Your confirmation is ready — use the print dialog to save as PDF or share it.','ok');
   }catch(e){ console.error(e); toast('We could not create your confirmation. Please try again.','err'); }
-  finally{ Object.assign(sheet.style,previous); }
 }
 function openPhoneVerify(b){
   return new Promise(resolve=>{
