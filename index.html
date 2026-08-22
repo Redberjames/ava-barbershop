@@ -1492,7 +1492,7 @@ async function downloadBookingReceipt(b){
       w.document.write('<html><head><title>Appointment Confirmation</title><style>body{margin:0;background:#11100d;color:#f4efe4;font-family:Arial,sans-serif}*{box-sizing:border-box}</style></head><body>'+sheet.outerHTML+'</body></html>'); w.document.close(); w.focus(); setTimeout(()=>w.print(),500);
     }
     toast('Your appointment confirmation is ready.','ok');
-  }catch(e){ console.error(e); toast('We could not create your confirmation. Please try again.','err'); }
+  }catch(e){ console.error(e); toast('We could not create your confirmation: '+(e && e.message ? e.message : 'Unknown error'),'err'); }
   finally{ Object.assign(sheet.style,previous); }
 }
 function openPhoneVerify(b){
