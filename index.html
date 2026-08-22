@@ -1343,10 +1343,20 @@ async function downloadBookingReceipt(b){
   $('#receiptAppointment').innerHTML=`${esc(b.serviceName)}<br>${esc(fmtDisplayDate(b.date))}<br><strong>${esc(fmtTime12(b.time))}</strong><br>${duration} minutes`;
   $('#receiptLocation').textContent=DATA.wordings.address||'Ava Barbershop';
   const sheet=$('#receiptSheet');
+  const previous={position:sheet.style.position,left:sheet.style.left,top:sheet.style.top,zIndex:sheet.style.zIndex,opacity:sheet.style.opacity,pointerEvents:sheet.style.pointerEvents};
   try{
-    if(window.html2pdf){ await window.html2pdf().set({margin:0.18,filename:`${bookingRef(b)}-appointment-confirmation.pdf`,image:{type:'jpeg',quality:.96},html2canvas:{scale:2,useCORS:true,backgroundColor:'#11100d'},jsPDF:{unit:'in',format:[4.1,6.7],orientation:'portrait'}}).from(sheet).save(); }
-    else { const w=window.open('','_blank'); if(!w){toast('Please allow pop-ups to print your confirmation.','err');return;} w.document.write('<html><head><title>Appointment Confirmation</title></head><body>'+sheet.outerHTML+'</body></html>'); w.document.close(); w.focus(); setTimeout(()=>w.print(),400); }
-  }catch(e){ console.error(e); toast('Could not create the confirmation. Please try again.','err'); }
+    // html2canvas cannot reliably capture an element positioned far outside the viewport.
+    // Temporarily place the receipt on-canvas while generating, then restore it.
+    sheet.style.position='fixed'; sheet.style.left='0'; sheet.style.top='0'; sheet.style.zIndex='-1'; sheet.style.opacity='1'; sheet.style.pointerEvents='none';
+    if(window.html2pdf){
+      await window.html2pdf().set({margin:0.18,filename:`${bookingRef(b)}-appointment-confirmation.pdf`,image:{type:'jpeg',quality:.96},html2canvas:{scale:2,useCORS:true,backgroundColor:'#11100d',logging:false},jsPDF:{unit:'in',format:[4.1,6.7],orientation:'portrait'}}).from(sheet).save();
+    } else {
+      const w=window.open('','_blank'); if(!w){toast('Please allow pop-ups to print your confirmation.','err');return;}
+      w.document.write('<html><head><title>Appointment Confirmation</title><style>body{margin:0;background:#11100d;color:#f4efe4;font-family:Arial,sans-serif}*{box-sizing:border-box}</style></head><body>'+sheet.outerHTML+'</body></html>'); w.document.close(); w.focus(); setTimeout(()=>w.print(),500);
+    }
+    toast('Your appointment confirmation is ready.','ok');
+  }catch(e){ console.error(e); toast('We could not create your confirmation. Please try again.','err'); }
+  finally{ Object.assign(sheet.style,previous); }
 }
 function openPhoneVerify(b){
   return new Promise(resolve=>{

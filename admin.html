@@ -705,7 +705,14 @@ function pageBookings(){
       <div class="mini-cal" id="admMiniCal"></div>
     </div>
     <div class="card">
-      <h3 id="admBookHead">Bookings</h3>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+        <h3 id="admBookHead" style="margin:0;">Bookings</h3>
+        <div class="field" style="margin:0;min-width:240px;flex:1;max-width:360px;">
+          <label for="admBookingSearch">Search bookings</label>
+          <input id="admBookingSearch" type="search" placeholder="Name, phone, service or AVA-XXXXXX" autocomplete="off">
+        </div>
+      </div>
+      <div class="helptext" style="margin:8px 0 14px;">Search by client name, mobile number, service, or the reference shown on the client's confirmation.</div>
       <div id="admBookList"></div>
     </div>`;
 }
@@ -729,19 +736,32 @@ function renderAdminCalendar(){
   });
   renderAdminBookList();
 }
+function bookingRef(b){
+  const raw=String(b.id||'').replace(/[^a-z0-9]/gi,'').toUpperCase();
+  let h=2166136261; for(let i=0;i<raw.length;i++){ h^=raw.charCodeAt(i); h=Math.imul(h,16777619); }
+  return 'AVA-'+(h>>>0).toString(36).toUpperCase().padStart(6,'0').slice(-6);
+}
 function renderAdminBookList(){
   $("#admBookHead").textContent = "Bookings — " + fmtDisplayDate(adminSelectedDate);
-  const list = DATA.bookings.filter(b=>b.date===adminSelectedDate).sort((a,b)=>a.time.localeCompare(b.time));
+  const q=(($("#admBookingSearch")?.value)||'').trim().toLowerCase();
+  const all=DATA.bookings.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  const base=q ? all : all.filter(b=>b.date===adminSelectedDate);
+  const list=base.filter(b=>{
+    if(!q) return true;
+    const hay=[b.name,b.phone,b.serviceName,b.status,bookingRef(b),b.date,b.time].join(' ').toLowerCase();
+    return hay.includes(q);
+  });
+  if(q) $("#admBookHead").textContent = `Search Results — ${list.length}`;
   $("#admBookList").innerHTML = list.length ? list.map(b=>`
     <div class="list-row">
-      <div class="main"><b>${fmtTime12(b.time)} · ${esc(b.name)}</b><div class="m2">${esc(b.serviceName)} · ₱${b.price} · 📞 ${esc(b.phone)}${b.notes?(' · '+esc(b.notes)):''}</div></div>
+      <div class="main"><b>${fmtTime12(b.time)} · ${esc(b.name)}</b><div class="m2"><strong style="color:var(--accent);letter-spacing:.08em;">REF ${esc(bookingRef(b))}</strong> · ${esc(b.serviceName)} · ₱${b.price} · 📞 ${esc(b.phone)}${b.notes?(' · '+esc(b.notes)):''}${q?(' · '+esc(fmtDisplayDate(b.date))):''}</div></div>
       <div class="acts">
         <span class="pill ${b.status}">${b.status}</span>
         ${DATA.bookingMode !== "auto" && b.status==="pending" ? `<button class="icon-btn" data-conf="${b.id}" title="Confirm">✓</button>`:""}
         ${b.status!=="cancelled" ? `<button class="icon-btn del" data-canc="${b.id}" title="Cancel">✕</button>`:""}
         <button class="icon-btn del" data-delbk="${b.id}" title="Delete">🗑</button>
       </div>
-    </div>`).join("") : `<div class="empty-state">No bookings for this day.</div>`;
+    </div>`).join("") : `<div class="empty-state">${q?'No bookings match that search.':'No bookings for this day.'}</div>`;
 }
 
 /* ---- Gallery ---- */
@@ -837,7 +857,7 @@ function renderTestiList(list, isPending){
 /* ---- Settings ---- */
 function pageSettings(){
   const auto = DATA.bookingMode === "auto";
-  return topbar("Settings", "Password, booking approval, cancellation policy, brand color, and shop preferences.") + `
+  return topbar("Settings", "Password, booking approval, brand color, and shop preferences.") + `
     <div class="card">
       <h3>Booking Approval</h3>
       <div class="admin-form">
@@ -851,19 +871,6 @@ function pageSettings(){
       </div>
       <div class="helptext" style="margin-top:10px;">${auto ? "Auto accept is ON. New valid bookings are confirmed immediately, so the manual Confirm action is disabled." : "Manual approval is ON. New bookings stay Pending until you confirm or cancel them."} Cancelled bookings still release their time slot.</div>
       <button class="btn btn-solid btn-sm" id="saveBookingMode" style="margin-top:14px;"><span>Save Booking Setting</span></button>
-    </div>
-    <div class="card">
-      <h3>Client Cancellation</h3>
-      <div class="admin-form">
-        <div class="field">
-          <label for="cancellationNoticeHours">Minimum notice before appointment</label>
-          <select id="cancellationNoticeHours">
-            ${[0,1,2,4,12,24].map(h=>`<option value="${h}" ${(+DATA.cancellationNoticeHours||0)===h?'selected':''}>${h===0?'Anytime':h+' hour'+(h===1?'':'s')+' before'}</option>`).join('')}
-          </select>
-        </div>
-      </div>
-      <div class="helptext" style="margin-top:10px;">Clients can cancel confirmed or pending appointments online until this window begins. The database also enforces the same rule.</div>
-      <button class="btn btn-solid btn-sm" id="saveCancellationPolicy" style="margin-top:14px;"><span>Save Cancellation Policy</span></button>
     </div>
     <div class="card">
       <h3>Accent Color</h3>
@@ -957,6 +964,7 @@ function wireAdminPage(page){
     $("#admCalPrev").onclick = ()=>{ adminCalDate.setMonth(adminCalDate.getMonth()-1); renderAdminCalendar(); };
     $("#admCalNext").onclick = ()=>{ adminCalDate.setMonth(adminCalDate.getMonth()+1); renderAdminCalendar(); };
     renderAdminCalendar();
+    $("#admBookingSearch").addEventListener("input", ()=>renderAdminBookList());
     $("#admBookList").addEventListener("click", async e=>{
       const c = e.target.closest("[data-conf]"), x = e.target.closest("[data-canc]"), del = e.target.closest("[data-delbk]");
       if(c){
@@ -1065,6 +1073,43 @@ function wireAdminPage(page){
 }
 
 
+/* ---- Live booking monitor ---- */
+let adminBookingMonitorTimer = null;
+let adminBookingMonitorReady = false;
+async function refreshAdminBookingsLive(){
+  try{
+    const {data:row,error}=await sb.from("shop_data").select("value").eq("id",DATA_ROW_ID).maybeSingle();
+    if(error || !row || !row.value) return;
+    const remote=normalizeData(Object.assign(defaultData(),row.value,{
+      meta:Object.assign(defaultData().meta,row.value.meta||{}),
+      wordings:Object.assign(defaultData().wordings,row.value.wordings||{}),
+      hours:Object.assign(defaultData().hours,row.value.hours||{})
+    }));
+    const oldMap=new Map((DATA.bookings||[]).map(b=>[b.id,b]));
+    const remoteBookings=remote.bookings||[];
+    const newBookings=adminBookingMonitorReady ? remoteBookings.filter(b=>!oldMap.has(b.id)) : [];
+    const changed=JSON.stringify(remoteBookings)!==JSON.stringify(DATA.bookings||[]);
+    DATA.bookings=remoteBookings;
+    DATA.bookingMode=remote.bookingMode;
+    if(changed && adminPage==="bookings"){ renderAdminCalendar(); }
+    if(newBookings.length){
+      newBookings.forEach(b=>{
+        const status=(b.status||"pending").toLowerCase();
+        const mode=status==="confirmed" ? "Auto accepted" : "New booking request";
+        toast(`${mode} · ${b.name||"Client"} · ${fmtDisplayDate(b.date)} · ${fmtTime12(b.time)}`,"ok");
+      });
+    }
+    adminBookingMonitorReady=true;
+  }catch(e){ console.warn("Live booking check failed",e); }
+}
+function startAdminBookingMonitor(){
+  clearInterval(adminBookingMonitorTimer);
+  adminBookingMonitorReady=false;
+  refreshAdminBookingsLive();
+  adminBookingMonitorTimer=setInterval(refreshAdminBookingsLive,4000);
+  document.addEventListener("visibilitychange",()=>{ if(!document.hidden) refreshAdminBookingsLive(); });
+}
+
 /* ==========================================================================================
    BOOT
    ========================================================================================== */
@@ -1073,6 +1118,7 @@ async function boot(){
   $("#adminApp").classList.remove("hidden");
   initAdmin();
   await checkExistingSession();
+  startAdminBookingMonitor();
   $("#loader").classList.add("out");
 }
 boot();
