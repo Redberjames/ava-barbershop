@@ -35,6 +35,7 @@
   --ease: cubic-bezier(.22,.9,.25,1);
   --accent: var(--gold);
   --accent-2: var(--gold-2);
+  color-scheme: dark;
 }
 *{box-sizing:border-box;}
 html{scroll-behavior:smooth;}
@@ -96,6 +97,8 @@ img{max-width:100%; display:block;}
 #loader .ldtext{ font-family:'Bebas Neue'; letter-spacing:.3em; font-size:14px; color:var(--ink-faint); }
 .field label{ display:block; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:8px; }
 .field input, .field select, .field textarea{ width:100%; background:var(--bg-2); border:1px solid var(--line); color:var(--ink); padding:13px 14px; border-radius:6px; font-size:14px; outline:none; transition:border-color .25s; }
+.field select{ font-weight:500; -webkit-font-smoothing:antialiased; }
+.field select option{ background:var(--bg-2); color:var(--ink); font-weight:500; }
 .field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--accent); }
 .field textarea{ resize:vertical; min-height:70px; }
 .row2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
@@ -772,8 +775,7 @@ function pageServices(){
     <div class="card">
       <h3>Add Service</h3>
       <div class="admin-form">
-        <div class="row3">
-          <div class="field"><label for="s_name">Name</label><input id="s_name" placeholder="e.g. Skin Fade Haircut"></div>
+        <div class="row2">
           <div class="field"><label for="s_cat">Category</label><select id="s_cat">${svcCatOptions()}</select></div>
           <div class="field"><label for="s_price">Price (₱)</label><input id="s_price" type="number" min="0" placeholder="25"></div>
         </div>
@@ -794,15 +796,14 @@ function renderSvcList(){
   return DATA.services.map(s=>`
     <div class="list-row" style="display:block;">
       <div class="hair-row-top">
-        <div class="main"><b>${esc(s.name)}</b><div class="m2">${esc(s.category)} · ₱${s.price} · ${s.duration} min${s.desc?(" — "+esc(s.desc)):""}</div></div>
+        <div class="main"><b>${esc(s.category)}</b><div class="m2">₱${s.price} · ${s.duration} min${s.desc?(" — "+esc(s.desc)):""}</div></div>
         <div class="acts">
           <button class="icon-btn" data-edit-svc="${s.id}" title="Edit">✎</button>
           <button class="icon-btn del" data-del="${s.id}" title="Delete">✕</button>
         </div>
       </div>
       <div class="hair-edit-editor" id="svcEdit${s.id}">
-        <div class="row3">
-          <div class="field"><label for="svcName${s.id}">Name</label><input id="svcName${s.id}" data-svc-name="${s.id}" value="${esc(s.name)}"></div>
+        <div class="row2">
           <div class="field"><label for="svcCat${s.id}">Category</label><select id="svcCat${s.id}" data-svc-cat="${s.id}">${svcCatOptions(s.category)}</select></div>
           <div class="field"><label for="svcPrice${s.id}">Price (₱)</label><input id="svcPrice${s.id}" data-svc-price="${s.id}" type="number" min="0" value="${s.price}"></div>
         </div>
@@ -1172,8 +1173,8 @@ function wireAdminPage(page){
   }
   if(page==="services"){
     $("#addSvc").onclick = async ()=>{
-      const name = $("#s_name").value.trim(); if(!name){ toast("Please add a service name.","err"); return; }
-      DATA.services.push({ id:uid(), name, category:$("#s_cat").value, price:+$("#s_price").value||0, duration:+$("#s_dur").value||30, desc:$("#s_desc").value.trim() });
+      const category = $("#s_cat").value;
+      DATA.services.push({ id:uid(), name:category, category, price:+$("#s_price").value||0, duration:+$("#s_dur").value||30, desc:$("#s_desc").value.trim() });
       if(await persist()){ toast("Service added.","ok"); renderAdminPage(); }
     };
     $("#svcList").addEventListener("click", async e=>{
@@ -1184,10 +1185,8 @@ function wireAdminPage(page){
       if(save){
         const id = save.dataset.svcSave;
         const s = DATA.services.find(x=>x.id===id);
-        const name = $(`[data-svc-name="${id}"]`).value.trim();
-        if(!name){ toast("Service name can't be empty.","err"); return; }
-        s.name = name;
         s.category = $(`[data-svc-cat="${id}"]`).value;
+        s.name = s.category;
         s.price = +$(`[data-svc-price="${id}"]`).value || 0;
         s.duration = +$(`[data-svc-dur="${id}"]`).value || 30;
         s.desc = $(`[data-svc-desc="${id}"]`).value.trim();
