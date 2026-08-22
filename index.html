@@ -115,11 +115,18 @@ img{max-width:100%; display:block;}
 .hidden{ display:none !important; }
 .spinner{width:34px; height:34px; border-radius:50%; border:2px solid var(--line); border-top-color:var(--accent); animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.toast-wrap{position:fixed; top:22px; right:22px; z-index:12000; display:flex; flex-direction:column; gap:10px;}
-.toast{ background:var(--panel); border:1px solid var(--line); color:var(--ink); padding:14px 20px; border-radius:8px; font-size:13.5px; box-shadow:var(--shadow-gold); min-width:240px; animation:toastIn .3s var(--ease); }
-.toast.err{ border-color:var(--danger); }
-.toast.ok{ border-color:var(--success); }
-@keyframes toastIn{from{opacity:0; transform:translateX(24px);} to{opacity:1; transform:translateX(0);}}
+.toast-wrap{position:fixed;top:20px;right:20px;z-index:12000;display:flex;flex-direction:column;gap:10px;width:min(390px,calc(100vw - 32px));pointer-events:none;}
+.toast{position:relative;display:grid;grid-template-columns:34px 1fr 24px;align-items:start;gap:12px;background:rgba(17,16,13,.97);border:1px solid rgba(255,255,255,.10);color:var(--ink);padding:14px 14px 14px 15px;border-radius:14px;font-size:13px;line-height:1.45;box-shadow:0 18px 55px rgba(0,0,0,.42),0 0 30px rgba(201,162,76,.08);backdrop-filter:blur(18px);animation:toastIn .34s var(--ease);pointer-events:auto;overflow:hidden;}
+.toast:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);}
+.toast.err:before{background:#d99a9a}.toast.ok:before{background:#b9c98a}.toast.info:before{background:#9eb7c9}
+.toast-icon{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(238,203,122,.22);color:var(--accent);font-size:14px;background:rgba(201,162,76,.06);}
+.toast.err .toast-icon{color:#e2a0a0;border-color:rgba(217,140,140,.25);background:rgba(217,140,140,.06)}
+.toast.ok .toast-icon{color:#c7d59a;border-color:rgba(185,201,138,.25);background:rgba(185,201,138,.06)}
+.toast.info .toast-icon{color:#b9d0df;border-color:rgba(158,183,201,.25);background:rgba(158,183,201,.06)}
+.toast-copy{min-width:0}.toast-title{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:var(--accent);margin-bottom:3px;font-weight:700}.toast.err .toast-title{color:#e2a0a0}.toast.ok .toast-title{color:#c7d59a}.toast.info .toast-title{color:#b9d0df}.toast-message{color:var(--ink-dim);}
+.toast-close{appearance:none;border:0;background:none;color:var(--ink-faint);font-size:18px;line-height:1;cursor:pointer;padding:1px 0}.toast-close:hover{color:var(--ink)}
+@media(max-width:640px){.toast-wrap{top:auto;bottom:16px;right:16px;width:calc(100vw - 32px)}}
+@keyframes toastIn{from{opacity:0;transform:translateY(-10px) translateX(10px) scale(.98)}to{opacity:1;transform:none}}
 
 /* ============================= LOADER ============================= */
 #loader{ position:fixed; inset:0; background:var(--bg); z-index:99999; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:18px; transition:opacity .7s var(--ease), visibility .7s; }
@@ -410,7 +417,7 @@ img{max-width:100%; display:block;}
 .appointment-card{margin-top:18px;border:1px solid rgba(238,203,122,.18);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.015));border-radius:16px;padding:16px;box-shadow:0 16px 42px rgba(0,0,0,.22)}
 .appointment-card .ac-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}.appointment-card .ac-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.04em}.appointment-card .ac-ref{font-size:9px;letter-spacing:.16em;color:var(--ink-faint);text-transform:uppercase;margin-top:3px}.appointment-card .ac-status{font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:7px 9px;border-radius:999px;border:1px solid rgba(201,162,76,.28);color:var(--gold-2);white-space:nowrap}.appointment-card .ac-status.pending{color:var(--ink-faint);border-color:var(--line-soft)}.appointment-card .ac-status.cancelled{color:#d98c8c;border-color:rgba(217,140,140,.25)}
 .ac-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.ac-item{padding:11px 12px;border:1px solid var(--line-soft);border-radius:11px;background:rgba(0,0,0,.12)}.ac-item .k{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:5px}.ac-item .v{font-size:12px;line-height:1.35}.ac-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.ac-actions .btn{min-height:42px}.ac-cancel-note{font-size:10px;color:var(--ink-faint);line-height:1.5;margin-top:10px}.ac-cancel-note strong{color:var(--ink)}
-.booking-modal{position:fixed;inset:0;z-index:120;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);padding:14px}.booking-modal.show{display:flex}.booking-modal .modal-card{width:min(100%,520px);max-height:90vh;overflow:auto;background:#11100d;border:1px solid rgba(238,203,122,.2);border-radius:18px 18px 12px 12px;padding:20px;box-shadow:0 24px 80px rgba(0,0,0,.55)}.booking-modal h3{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em;margin:0 0 6px}.booking-modal .modal-sub{font-size:11px;color:var(--ink-faint);line-height:1.5;margin-bottom:16px}.booking-modal .modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.booking-modal .danger{border-color:rgba(217,140,140,.35);color:#e2a0a0}.receipt-sheet{position:fixed;left:-100000px;top:0;width:390px;background:#11100d;color:#f4efe4;padding:26px;font-family:Jost,Arial,sans-serif}.receipt-sheet .rs-logo{display:block;width:110px;height:110px;object-fit:contain;margin:0 auto 14px}.receipt-sheet .rs-eyebrow{font-size:9px;letter-spacing:.2em;text-align:center;color:#eecb7a;text-transform:uppercase}.receipt-sheet .rs-title{text-align:center;font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.05em;margin:5px 0}.receipt-sheet .rs-ref{text-align:center;font-size:10px;letter-spacing:.18em;color:#aaa;text-transform:uppercase;margin-bottom:22px}.receipt-sheet .rs-status{text-align:center;border:1px solid rgba(238,203,122,.35);padding:9px;border-radius:10px;color:#eecb7a;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:18px}.receipt-sheet .rs-section{border-top:1px solid rgba(255,255,255,.12);padding-top:14px;margin-top:14px}.receipt-sheet .rs-label{font-size:8px;letter-spacing:.18em;color:#999;text-transform:uppercase;margin-bottom:6px}.receipt-sheet .rs-value{font-size:13px;line-height:1.5}.receipt-sheet .rs-footer{text-align:center;color:#888;font-size:9px;line-height:1.6;margin-top:24px}.receipt-sheet .rs-qr{margin:18px auto 0;width:120px;height:120px;border:1px solid rgba(255,255,255,.1);padding:5px}
+.booking-modal{position:fixed;inset:0;z-index:120;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);padding:14px}.booking-modal.show{display:flex}.booking-modal .modal-card{width:min(100%,520px);max-height:90vh;overflow:auto;background:#11100d;border:1px solid rgba(238,203,122,.2);border-radius:18px 18px 12px 12px;padding:20px;box-shadow:0 24px 80px rgba(0,0,0,.55)}.booking-modal h3{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.04em;margin:0 0 6px}.booking-modal .modal-sub{font-size:11px;color:var(--ink-faint);line-height:1.5;margin-bottom:16px}.booking-modal .modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.booking-modal .danger{border-color:rgba(217,140,140,.35);color:#e2a0a0}.verify-card{text-align:left}.verify-mark{width:44px;height:44px;border:1px solid rgba(238,203,122,.28);border-radius:50%;display:grid;place-items:center;color:var(--accent);font-size:20px;margin-bottom:14px;background:rgba(201,162,76,.05)}.verify-eyebrow{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}.verify-card h3{font-size:30px!important}.verify-ref{display:inline-flex;margin:2px 0 18px;padding:7px 10px;border:1px solid rgba(238,203,122,.16);border-radius:8px;color:var(--ink-faint);font-size:10px;letter-spacing:.12em;text-transform:uppercase}.verify-label{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 7px}.verify-card .input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:13px 14px;color:var(--ink);font:inherit;outline:none}.verify-card .input:focus{border-color:rgba(238,203,122,.5);box-shadow:0 0 0 3px rgba(201,162,76,.08)}.verify-actions{display:grid;grid-template-columns:1fr 1.35fr;gap:8px;margin-top:14px}.verify-note{font-size:10px;color:var(--ink-faint);line-height:1.5;margin-top:12px}.receipt-sheet{position:fixed;left:-100000px;top:0;width:390px;background:#11100d;color:#f4efe4;padding:26px;font-family:Jost,Arial,sans-serif}.receipt-sheet .rs-logo{display:block;width:110px;height:110px;object-fit:contain;margin:0 auto 14px}.receipt-sheet .rs-eyebrow{font-size:9px;letter-spacing:.2em;text-align:center;color:#eecb7a;text-transform:uppercase}.receipt-sheet .rs-title{text-align:center;font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.05em;margin:5px 0}.receipt-sheet .rs-ref{text-align:center;font-size:10px;letter-spacing:.18em;color:#aaa;text-transform:uppercase;margin-bottom:22px}.receipt-sheet .rs-status{text-align:center;border:1px solid rgba(238,203,122,.35);padding:9px;border-radius:10px;color:#eecb7a;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:18px}.receipt-sheet .rs-section{border-top:1px solid rgba(255,255,255,.12);padding-top:14px;margin-top:14px}.receipt-sheet .rs-label{font-size:8px;letter-spacing:.18em;color:#999;text-transform:uppercase;margin-bottom:6px}.receipt-sheet .rs-value{font-size:13px;line-height:1.5}.receipt-sheet .rs-footer{text-align:center;color:#888;font-size:9px;line-height:1.6;margin-top:24px}.receipt-sheet .rs-qr{margin:18px auto 0;width:120px;height:120px;border:1px solid rgba(255,255,255,.1);padding:5px}
 @media(max-width:640px){.ac-grid{grid-template-columns:1fr}.ac-actions{grid-template-columns:1fr}.appointment-card{padding:14px}.booking-modal{padding:0}.booking-modal .modal-card{border-radius:18px 18px 0 0;padding:18px}}
 /* ================= PREMIUM V2 UX POLISH ================= */
 :root{--premium-border:rgba(238,203,122,.18);--premium-glow:rgba(201,162,76,.12);--premium-surface:rgba(255,255,255,.025)}
@@ -694,6 +701,22 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
     </div>
   </div>
 </div>
+<div class="booking-modal" id="phoneVerifyModal" aria-hidden="true">
+  <div class="modal-card verify-card" role="dialog" aria-modal="true" aria-labelledby="phoneVerifyTitle">
+    <div class="verify-mark">⌁</div>
+    <div class="verify-eyebrow">Secure Appointment Access</div>
+    <h3 id="phoneVerifyTitle">Confirm Your Mobile Number</h3>
+    <div class="modal-sub">For your privacy, please enter the mobile number used when this appointment was booked.</div>
+    <div class="verify-ref" id="phoneVerifyRef"></div>
+    <label class="verify-label" for="phoneVerifyInput">Mobile Number</label>
+    <input id="phoneVerifyInput" class="input" type="tel" inputmode="tel" autocomplete="tel" placeholder="Enter your mobile number">
+    <div class="verify-actions">
+      <button class="btn" id="phoneVerifyClose">Go Back</button>
+      <button class="btn btn-solid" id="phoneVerifySubmit">Verify &amp; Continue</button>
+    </div>
+    <div class="verify-note">Your number is used only to verify this appointment.</div>
+  </div>
+</div>
 <div class="receipt-sheet" id="receiptSheet">
   <img class="rs-logo" id="receiptLogo" alt="Shop logo">
   <div class="rs-eyebrow" id="receiptShopName"></div>
@@ -737,13 +760,19 @@ function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(
 function $(s,el){ return (el||document).querySelector(s); }
 function $all(s,el){ return Array.from((el||document).querySelectorAll(s)); }
 function esc(s){ return (s==null?"":String(s)).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
-function toast(msg, kind){
+function toast(msg, kind, title){
   const wrap = $("#toastWrap");
+  if(!wrap) return;
   const el = document.createElement("div");
-  el.className = "toast" + (kind ? " "+kind : "");
-  el.textContent = msg;
+  const k = kind || "info";
+  const defaults = { ok:"All Set", err:"Something Needs Your Attention", info:"Ava Barbershop" };
+  const icons = { ok:"✓", err:"!", info:"✦" };
+  el.className = "toast " + k;
+  el.innerHTML = `<div class="toast-icon" aria-hidden="true">${icons[k]||icons.info}</div><div class="toast-copy"><div class="toast-title">${esc(title||defaults[k]||defaults.info)}</div><div class="toast-message">${esc(msg)}</div></div><button class="toast-close" aria-label="Dismiss notification">×</button>`;
   wrap.appendChild(el);
-  setTimeout(()=>{ el.style.transition="opacity .3s"; el.style.opacity="0"; setTimeout(()=>el.remove(),300); }, 3200);
+  const close=()=>{ el.style.transition="opacity .25s, transform .25s"; el.style.opacity="0"; el.style.transform="translateY(8px)"; setTimeout(()=>el.remove(),250); };
+  el.querySelector(".toast-close").onclick=close;
+  setTimeout(close, 4200);
 }
 async function sha256(str){
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
@@ -1319,16 +1348,33 @@ async function downloadBookingReceipt(b){
     else { const w=window.open('','_blank'); if(!w){toast('Please allow pop-ups to print your confirmation.','err');return;} w.document.write('<html><head><title>Appointment Confirmation</title></head><body>'+sheet.outerHTML+'</body></html>'); w.document.close(); w.focus(); setTimeout(()=>w.print(),400); }
   }catch(e){ console.error(e); toast('Could not create the confirmation. Please try again.','err'); }
 }
+function openPhoneVerify(b){
+  return new Promise(resolve=>{
+    const modal=$("#phoneVerifyModal"), input=$("#phoneVerifyInput");
+    if(!modal||!input){ resolve(null); return; }
+    $("#phoneVerifyRef").textContent=`Reference ${bookingRef(b)}`;
+    input.value="";
+    modal.classList.add("show"); modal.setAttribute("aria-hidden","false");
+    setTimeout(()=>input.focus(),120);
+    const finish=(value)=>{ modal.classList.remove("show"); modal.setAttribute("aria-hidden","true"); cleanup(); resolve(value); };
+    const cleanup=()=>{ $("#phoneVerifyClose").removeEventListener("click",cancel); $("#phoneVerifySubmit").removeEventListener("click",submit); input.removeEventListener("keydown",key); };
+    const cancel=()=>finish(null);
+    const submit=()=>{ const value=input.value.trim(); if(!value){ toast('Please enter the mobile number used for this appointment.','err','Mobile Number Required'); input.focus(); return; } finish(value); };
+    const key=e=>{ if(e.key==='Enter'){e.preventDefault();submit();} if(e.key==='Escape'){e.preventDefault();cancel();} };
+    $("#phoneVerifyClose").addEventListener("click",cancel);
+    $("#phoneVerifySubmit").addEventListener("click",submit);
+    input.addEventListener("keydown",key);
+  });
+}
 async function cancelBooking(b){
-  if(!b || !canCancelBooking(b)){ toast('This appointment can no longer be cancelled online.','err'); return; }
-  const phone=prompt('For security, enter the phone number used for this booking:');
+  if(!b || !canCancelBooking(b)){ toast('This appointment can no longer be cancelled online. Please contact the shop directly.','err','Cancellation Unavailable'); return; }
+  const phone=await openPhoneVerify(b);
   if(phone===null)return;
-  if(!phone.trim()){toast('Phone number is required.','err');return;}
-  const {data,error}=await sb.rpc('cancel_booking',{p_booking_id:String(b.id),p_phone:phone.trim()});
-  if(error){console.error('cancel_booking failed',error);toast(error.message||'Could not cancel the appointment.','err');return;}
+  const {data,error}=await sb.rpc('cancel_booking',{p_booking_id:String(b.id),p_phone:phone});
+  if(error){ console.error('cancel_booking failed',error); toast('We could not verify this appointment. Please check the mobile number and try again.','err','Verification Unsuccessful'); return; }
   DATA.bookings=DATA.bookings.map(x=>x.id===b.id?Object.assign({},x,{status:'cancelled'}):x);
   await saveMyBookings((await loadMyBookings()).filter(x=>x.id!==b.id));
-  closeBookingModal(); renderCal(); await renderMyBookings(); toast('Your appointment has been cancelled.','ok');
+  closeBookingModal(); renderCal(); await renderMyBookings(); toast('Your appointment has been cancelled successfully.','ok','Appointment Cancelled');
 }
 async function renderMyBookings(){
   const mine=(await loadMyBookings()).sort((a,b)=>b.createdAt-a.createdAt);
