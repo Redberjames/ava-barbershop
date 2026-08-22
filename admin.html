@@ -96,6 +96,17 @@ img{max-width:100%; display:block;}
 #loader .ldtext{ font-family:'Bebas Neue'; letter-spacing:.3em; font-size:14px; color:var(--ink-faint); }
 .field label{ display:block; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:8px; }
 .field input, .field select, .field textarea{ width:100%; background:var(--bg-2); border:1px solid var(--line); color:var(--ink); padding:13px 14px; border-radius:6px; font-size:14px; outline:none; transition:border-color .25s; }
+/* Native <select> dropdown lists are rendered by the OS, outside our styled DOM.
+   Custom webfonts (Jost) plus -webkit-font-smoothing:antialiased (set on body)
+   often render blurry/thin in that native popup. Force a system font stack and
+   normal font smoothing on selects + their options so the open dropdown list
+   looks crisp on every OS/browser. */
+.field select, .field select option{
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: auto;
+  font-weight: 500;
+}
+.field select option{ color:#111; background:#fff; }
 .field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--accent); }
 .field textarea{ resize:vertical; min-height:70px; }
 .row2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
@@ -863,7 +874,7 @@ function pageSettings(){
     <div class="card">
       <h3>Booking Approval</h3>
       <div class="admin-form">
-        <div class="field">
+        <div class="field" style="max-width:340px;">
           <label for="bookingMode">New Booking Requests</label>
           <select id="bookingMode">
             <option value="manual" ${!auto?'selected':''}>Manual approval — admin confirms each booking</option>
