@@ -159,8 +159,13 @@ img{max-width:100%; display:block;}
 .hair-row-main{ display:flex; align-items:center; gap:12px; flex:1; min-width:0; }
 .hair-thumb{ width:44px; height:44px; border-radius:8px; overflow:hidden; border:1px solid var(--line); flex-shrink:0; display:flex; align-items:center; justify-content:center; background:var(--bg-2); color:var(--ink-faint); font-size:15px; }
 .hair-thumb img{ width:100%; height:100%; object-fit:cover; }
-.hair-photo-editor{ display:none; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line); }
-.hair-photo-editor.open{ display:block; }
+.hair-photo-editor,.hair-edit-editor{ display:none; margin-top:14px; padding-top:14px; border-top:1px dashed var(--line); }
+.hair-photo-editor.open,.hair-edit-editor.open{ display:block; }
+.cat-row{ display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid var(--line); }
+.cat-row:last-child{ border-bottom:none; }
+.cat-row input{ flex:1; background:var(--bg-2); border:1px solid var(--line); color:var(--ink); padding:10px 12px; border-radius:6px; font-size:13.5px; outline:none; transition:border-color .25s; }
+.cat-row input:focus{ border-color:var(--accent); }
+.cat-count{ font-size:11px; color:var(--ink-faint); white-space:nowrap; min-width:56px; text-align:right; }
 .swatches{ display:flex; gap:10px; }
 .swatch{ width:34px; height:34px; border-radius:50%; border:2px solid transparent; cursor:pointer; }
 .swatch.sel{ border-color:#fff; }
@@ -360,6 +365,7 @@ function defaultData(){
       {id:uid(), url:"https://images.unsplash.com/photo-1605497788044-5a32c7078486?q=80&w=900&auto=format&fit=crop", caption:"Beard shape-up"}
     ],
     haircutImages:{},
+    ...seedHaircutCatalog(),
     testimonials:[
       {id:uid(), name:"Marco R.", stars:5, text:"Best fade I've had in this city. The chair experience alone is worth it.", date:fmtDateKey(new Date()), approved:true, source:"admin"},
       {id:uid(), name:"Diego T.", stars:5, text:"Walked in stressed, walked out feeling like a new man. Ava Barbershop gets it.", date:fmtDateKey(new Date()), approved:true, source:"admin"},
@@ -400,6 +406,10 @@ function normalizeData(d){
   d.testimonials = (d.testimonials||[]).map(t=> Object.assign({ date: fmtDateKey(new Date()), approved:true, source:"admin" }, t));
   d.bookingMode = d.bookingMode === "auto" ? "auto" : "manual";
   d.haircutImages = d.haircutImages || {};
+  if(!Array.isArray(d.haircutCatalog) || !d.haircutCatalog.length){
+    Object.assign(d, seedHaircutCatalog(d.haircutImages));
+  }
+  d.haircutCategories = Array.isArray(d.haircutCategories) ? d.haircutCategories : [];
   return d;
 }
 let saveTimer=null;
@@ -651,44 +661,95 @@ function renderAnnList(){
     </div>`).join("");
 }
 
-/* ---- Hard-coded Haircut Inspiration Catalog ---- */
+/* ---- Starter Haircut Catalog (seeds DATA.haircutCatalog / DATA.haircutCategories
+   on first run only — after that, everything lives in DATA and is fully editable) ---- */
 const HAIRCUT_CATALOG = [{"n": "Low Taper Fade", "c": "Taper & Fade"}, {"n": "Mid Taper Fade", "c": "Taper & Fade"}, {"n": "High Taper Fade", "c": "Taper & Fade"}, {"n": "Low Fade", "c": "Taper & Fade"}, {"n": "Mid Fade", "c": "Taper & Fade"}, {"n": "High Fade", "c": "Taper & Fade"}, {"n": "Low Skin Fade", "c": "Taper & Fade"}, {"n": "Mid Skin Fade", "c": "Taper & Fade"}, {"n": "High Skin Fade", "c": "Taper & Fade"}, {"n": "Bald Fade", "c": "Taper & Fade"}, {"n": "Drop Fade", "c": "Taper & Fade"}, {"n": "Burst Fade", "c": "Taper & Fade"}, {"n": "Temple Fade", "c": "Taper & Fade"}, {"n": "Shadow Fade", "c": "Taper & Fade"}, {"n": "Taper Fade", "c": "Taper & Fade"}, {"n": "Skin Taper", "c": "Taper & Fade"}, {"n": "Neck Taper", "c": "Taper & Fade"}, {"n": "Low Drop Fade", "c": "Taper & Fade"}, {"n": "High Drop Fade", "c": "Taper & Fade"}, {"n": "Burst Taper Fade", "c": "Taper & Fade"}, {"n": "Textured Crop", "c": "Crop & Fringe"}, {"n": "French Crop", "c": "Crop & Fringe"}, {"n": "Modern Caesar", "c": "Crop & Fringe"}, {"n": "Textured Fringe", "c": "Crop & Fringe"}, {"n": "Messy Fringe", "c": "Crop & Fringe"}, {"n": "Choppy Crop", "c": "Crop & Fringe"}, {"n": "Short Crop Fade", "c": "Crop & Fringe"}, {"n": "Crop Top Fade", "c": "Crop & Fringe"}, {"n": "Heavy Fringe", "c": "Crop & Fringe"}, {"n": "Blunt Fringe", "c": "Crop & Fringe"}, {"n": "Edgar Cut", "c": "Crop & Fringe"}, {"n": "Textured Edgar", "c": "Crop & Fringe"}, {"n": "Taper Edgar", "c": "Crop & Fringe"}, {"n": "Fluffy Fringe", "c": "Crop & Fringe"}, {"n": "Side-Swept Fringe", "c": "Crop & Fringe"}, {"n": "French Crop Fade", "c": "Crop & Fringe"}, {"n": "Textured Caesar Fade", "c": "Crop & Fringe"}, {"n": "Short Textured Fringe", "c": "Crop & Fringe"}, {"n": "Long Fringe Crop", "c": "Crop & Fringe"}, {"n": "Disconnected Crop", "c": "Crop & Fringe"}, {"n": "Modern Quiff", "c": "Quiff & Pompadour"}, {"n": "Textured Quiff", "c": "Quiff & Pompadour"}, {"n": "Messy Quiff", "c": "Quiff & Pompadour"}, {"n": "Short Quiff", "c": "Quiff & Pompadour"}, {"n": "Quiff Fade", "c": "Quiff & Pompadour"}, {"n": "High-Volume Quiff", "c": "Quiff & Pompadour"}, {"n": "Low Taper Quiff", "c": "Quiff & Pompadour"}, {"n": "Mid Fade Quiff", "c": "Quiff & Pompadour"}, {"n": "Disconnected Quiff", "c": "Quiff & Pompadour"}, {"n": "Curly Quiff", "c": "Quiff & Pompadour"}, {"n": "Classic Pompadour", "c": "Quiff & Pompadour"}, {"n": "Modern Pompadour", "c": "Quiff & Pompadour"}, {"n": "Pompadour Fade", "c": "Quiff & Pompadour"}, {"n": "Low Fade Pompadour", "c": "Quiff & Pompadour"}, {"n": "Undercut Pompadour", "c": "Quiff & Pompadour"}, {"n": "Textured Pompadour", "c": "Quiff & Pompadour"}, {"n": "Messy Pompadour", "c": "Quiff & Pompadour"}, {"n": "Short Pompadour", "c": "Quiff & Pompadour"}, {"n": "Side-Part Pompadour", "c": "Quiff & Pompadour"}, {"n": "Slick Pompadour", "c": "Quiff & Pompadour"}, {"n": "Modern Slick Back", "c": "Slick / Comb / Part"}, {"n": "Slick Back Fade", "c": "Slick / Comb / Part"}, {"n": "Slick Back Undercut", "c": "Slick / Comb / Part"}, {"n": "Textured Slick Back", "c": "Slick / Comb / Part"}, {"n": "Messy Slick Back", "c": "Slick / Comb / Part"}, {"n": "Classic Comb Over", "c": "Slick / Comb / Part"}, {"n": "Comb Over Fade", "c": "Slick / Comb / Part"}, {"n": "Textured Comb Over", "c": "Slick / Comb / Part"}, {"n": "Low Taper Comb Over", "c": "Slick / Comb / Part"}, {"n": "Hard-Part Comb Over", "c": "Slick / Comb / Part"}, {"n": "Classic Side Part", "c": "Slick / Comb / Part"}, {"n": "Modern Side Part", "c": "Slick / Comb / Part"}, {"n": "Side Part Fade", "c": "Slick / Comb / Part"}, {"n": "Side Part Taper", "c": "Slick / Comb / Part"}, {"n": "Hard Part", "c": "Slick / Comb / Part"}, {"n": "Classic Undercut", "c": "Slick / Comb / Part"}, {"n": "Disconnected Undercut", "c": "Slick / Comb / Part"}, {"n": "Undercut Fade", "c": "Slick / Comb / Part"}, {"n": "Textured Undercut", "c": "Slick / Comb / Part"}, {"n": "Long Undercut", "c": "Slick / Comb / Part"}, {"n": "Korean Two-Block", "c": "Korean / Asian"}, {"n": "Two-Block Fade", "c": "Korean / Asian"}, {"n": "Textured Two-Block", "c": "Korean / Asian"}, {"n": "Comma Hair", "c": "Korean / Asian"}, {"n": "Korean Middle Part", "c": "Korean / Asian"}, {"n": "Korean Curtains", "c": "Korean / Asian"}, {"n": "Korean Side Part", "c": "Korean / Asian"}, {"n": "Korean Textured Crop", "c": "Korean / Asian"}, {"n": "Korean Fluffy Cut", "c": "Korean / Asian"}, {"n": "Korean Down-Perm Style", "c": "Korean / Asian"}, {"n": "Modern Mullet", "c": "Mullet / Wolf"}, {"n": "Taper Mullet", "c": "Mullet / Wolf"}, {"n": "Burst Fade Mullet", "c": "Mullet / Wolf"}, {"n": "Low Fade Mullet", "c": "Mullet / Wolf"}, {"n": "Textured Mullet", "c": "Mullet / Wolf"}, {"n": "Curly Mullet", "c": "Mullet / Wolf"}, {"n": "Short Mullet", "c": "Mullet / Wolf"}, {"n": "Long Mullet", "c": "Mullet / Wolf"}, {"n": "Shaggy Mullet", "c": "Mullet / Wolf"}, {"n": "Wolf Cut", "c": "Mullet / Wolf"}];
+function seedHaircutCatalog(existingImages){
+  existingImages = existingImages || {};
+  const catMap = {};
+  const categories = [];
+  HAIRCUT_CATALOG.forEach(h=>{
+    if(!catMap[h.c]){ catMap[h.c] = uid(); categories.push({id:catMap[h.c], name:h.c}); }
+  });
+  const catalog = HAIRCUT_CATALOG.map((h,i)=>({ id:uid(), name:h.n, categoryId:catMap[h.c], image: existingImages[i]||"" }));
+  return { haircutCategories: categories, haircutCatalog: catalog };
+}
+function catName(catId){
+  const c = DATA.haircutCategories.find(x=>x.id===catId);
+  return c ? c.name : "Uncategorized";
+}
+function catOptions(selectedId){
+  const opts = DATA.haircutCategories.map(c=>`<option value="${c.id}" ${c.id===selectedId?"selected":""}>${esc(c.name)}</option>`).join("");
+  return `<option value="" ${!selectedId?"selected":""}>Uncategorized</option>` + opts;
+}
 function pageHaircutCatalog(){
-  return topbar("Haircut Styles", "100 hard-coded inspiration styles. Names and categories are locked, but you can add a photo for each one — it shows on the public style page.") + `
-    <div class="card" id="haircutCatalog">
+  return topbar("Haircut Styles", "Manage your style menu — rename styles, regroup categories, or add new ones. Add a photo for each one and it shows on the public style page.") + `
+    <div class="card" id="haircutCategories">
       <div style="display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;">
-        <div><h3 style="margin-bottom:5px;">100 Style Library</h3><div class="m2">Use these styles as inspiration. Add one to your service menu or add all 100 at once.</div></div>
-        <button class="btn btn-solid btn-sm" id="addAllHaircuts"><span>Add All 100 to Services</span></button>
+        <div><h3 style="margin-bottom:5px;">Categories (${DATA.haircutCategories.length})</h3><div class="m2">Group your styles — these also become the filter buttons on your public style page.</div></div>
       </div>
-      <div class="list-row" style="margin-top:18px;"><div class="main"><b>Catalog protection</b><div class="m2">The 100 style definitions below are hard-coded. They have no edit or delete controls — only their photos can be changed.</div></div><span class="pill confirmed">LOCKED</span></div>
-      <div id="haircutAdminList" style="margin-top:10px;">${HAIRCUT_CATALOG.map((h,i)=>renderHaircutRow(h,i)).join("")}</div>
+      <div class="row2" style="margin-top:16px;">
+        <div class="field"><label for="newCatName">New Category Name</label><input id="newCatName" placeholder="e.g. Curly Styles"></div>
+        <div style="display:flex;align-items:flex-end;"><button class="btn btn-solid btn-sm" id="addCat" style="width:100%;"><span>Add Category</span></button></div>
+      </div>
+      <div id="catList" style="margin-top:16px;">${renderCatList()}</div>
+    </div>
+    <div class="card" id="haircutCatalogCard">
+      <div style="display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;">
+        <div><h3 style="margin-bottom:5px;">Style Library (${DATA.haircutCatalog.length})</h3><div class="m2">Add, rename, recategorize, or remove haircut styles.</div></div>
+      </div>
+      <div class="row2" style="margin-top:16px;padding:18px;background:var(--bg-2);border-radius:10px;border:1px solid var(--line);">
+        <div class="field"><label for="newStyleName">New Style Name</label><input id="newStyleName" placeholder="e.g. Textured Crop"></div>
+        <div class="field"><label for="newStyleCat">Category</label><select id="newStyleCat">${catOptions(DATA.haircutCategories[0] && DATA.haircutCategories[0].id)}</select></div>
+      </div>
+      <button class="btn btn-solid btn-sm" id="addStyle" style="margin-top:14px;"><span>Add Style</span></button>
+      <div id="haircutAdminList" style="margin-top:18px;">${DATA.haircutCatalog.map(h=>renderHaircutRow(h)).join("")}</div>
     </div>`;
 }
-function renderHaircutRow(h, i){
-  const img = DATA.haircutImages[i] || "";
-  return `<div class="list-row hair-row" data-hair-row="${i}">
+function renderCatList(){
+  if(!DATA.haircutCategories.length) return `<div class="empty-state">No categories yet — add one above.</div>`;
+  return DATA.haircutCategories.map(c=>{
+    const n = DATA.haircutCatalog.filter(h=>h.categoryId===c.id).length;
+    return `<div class="cat-row" data-cat-row="${c.id}">
+      <input data-cat-name="${c.id}" value="${esc(c.name)}">
+      <span class="cat-count">${n} style${n===1?"":"s"}</span>
+      <button class="icon-btn del" data-del-cat="${c.id}" title="Delete category">✕</button>
+    </div>`;
+  }).join("");
+}
+function renderHaircutRow(h){
+  const img = h.image || "";
+  return `<div class="list-row hair-row" data-hair-row="${h.id}">
       <div class="hair-row-top">
         <div class="hair-row-main">
           <div class="hair-thumb">${img ? `<img src="${esc(img)}">` : "—"}</div>
           <div class="main">
-            <b><span style="color:var(--accent);margin-right:8px;">${String(i+1).padStart(2,'0')}</span>${esc(h.n)}</b>
-            <div class="m2">${esc(h.c)}</div>
+            <b>${esc(h.name)}</b>
+            <div class="m2">${esc(catName(h.categoryId))}</div>
           </div>
         </div>
         <div class="acts">
-          <button class="btn btn-ghost btn-sm" data-photo-toggle="${i}">${img ? "Change Photo" : "Add Photo"}</button>
-          <button class="btn btn-ghost btn-sm" data-add-haircut="${i}">Add to Services</button>
+          <button class="icon-btn" data-edit-toggle="${h.id}" title="Edit name / category">✎</button>
+          <button class="icon-btn" data-photo-toggle="${h.id}" title="${img?"Change photo":"Add photo"}">🖼</button>
+          <button class="icon-btn del" data-del-style="${h.id}" title="Delete style">✕</button>
         </div>
       </div>
-      <div class="hair-photo-editor" id="hairPhotoEditor${i}">
+      <div class="hair-edit-editor" id="hairEditEditor${h.id}">
         <div class="row2">
-          <div class="field"><label for="hairUrl${i}">Image URL (or Google Drive link)</label><input id="hairUrl${i}" data-hair-url="${i}" placeholder="https://..."></div>
-          <div class="field"><label for="hairFile${i}">Or Upload From Device</label><input id="hairFile${i}" type="file" accept="image/*" data-hair-file="${i}"></div>
+          <div class="field"><label for="hairName${h.id}">Style Name</label><input id="hairName${h.id}" data-hair-name="${h.id}" value="${esc(h.name)}"></div>
+          <div class="field"><label for="hairCat${h.id}">Category</label><select id="hairCat${h.id}" data-hair-cat="${h.id}">${catOptions(h.categoryId)}</select></div>
+        </div>
+        <button class="btn btn-solid btn-sm" data-hair-name-save="${h.id}" style="margin-top:12px;"><span>Save Changes</span></button>
+      </div>
+      <div class="hair-photo-editor" id="hairPhotoEditor${h.id}">
+        <div class="row2">
+          <div class="field"><label for="hairUrl${h.id}">Image URL (or Google Drive link)</label><input id="hairUrl${h.id}" data-hair-url="${h.id}" placeholder="https://..."></div>
+          <div class="field"><label for="hairFile${h.id}">Or Upload From Device</label><input id="hairFile${h.id}" type="file" accept="image/*" data-hair-file="${h.id}"></div>
         </div>
         <div class="helptext" style="margin-top:8px;">Tip: paste a direct image link, a shared Google Drive link ("Anyone with the link"), or upload a photo from this device — it's resized automatically to keep the site fast.</div>
         <div style="display:flex;gap:8px;margin-top:12px;">
-          <button class="btn btn-solid btn-sm" data-hair-save="${i}"><span>Save Photo</span></button>
-          ${img ? `<button class="btn btn-ghost btn-sm" data-hair-remove="${i}">Remove Photo</button>` : ""}
+          <button class="btn btn-solid btn-sm" data-hair-save="${h.id}"><span>Save Photo</span></button>
+          ${img ? `<button class="btn btn-ghost btn-sm" data-hair-remove="${h.id}">Remove Photo</button>` : ""}
         </div>
       </div>
     </div>`;
@@ -702,14 +763,18 @@ function normalizeImageUrl(url){
 }
 
 /* ---- Services ---- */
+const SERVICE_CATEGORIES = ["Haircut","Hair Color / Dye","Beard Trim & Shape","Shave","Hair Treatment","Kids Cut","Hair Styling","Grooming Package","Other"];
+function svcCatOptions(selected){
+  return SERVICE_CATEGORIES.map(c=>`<option value="${esc(c)}" ${c===selected?"selected":""}>${esc(c)}</option>`).join("");
+}
 function pageServices(){
-  return topbar("Services & Prices", "Set your style menu, prices, and duration.") + `
+  return topbar("Services & Prices", "Set your service menu, categories, and prices.") + `
     <div class="card">
       <h3>Add Service</h3>
       <div class="admin-form">
         <div class="row3">
-          <div class="field"><label for="s_name">Name</label><input id="s_name" placeholder="e.g. Skin Fade"></div>
-          <div class="field"><label for="s_cat">Category</label><input id="s_cat" placeholder="e.g. Haircuts" list="catList"><datalist id="catList">${Array.from(new Set(DATA.services.map(s=>s.category))).map(c=>`<option value="${esc(c)}">`).join("")}</datalist></div>
+          <div class="field"><label for="s_name">Name</label><input id="s_name" placeholder="e.g. Skin Fade Haircut"></div>
+          <div class="field"><label for="s_cat">Category</label><select id="s_cat">${svcCatOptions()}</select></div>
           <div class="field"><label for="s_price">Price (₱)</label><input id="s_price" type="number" min="0" placeholder="25"></div>
         </div>
         <div class="row2">
@@ -719,12 +784,6 @@ function pageServices(){
       </div>
       <button class="btn btn-solid btn-sm" id="addSvc" style="margin-top:14px;"><span>Add Service</span></button>
     </div>
-    <div class="card" style="border-color:rgba(215,181,109,.28);background:linear-gradient(135deg,var(--panel),rgba(215,181,109,.04));">
-      <div style="display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap;">
-        <div><h3 style="margin-bottom:5px;">100 Haircut Inspiration Styles</h3><div class="m2">Open the locked catalog to add one style manually or add all 100 to your service menu.</div></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-ghost btn-sm" id="openHaircutCatalog"><span>Browse Catalog</span></button><button class="btn btn-solid btn-sm" id="addAllHaircutsServices"><span>Add All 100</span></button></div>
-      </div>
-    </div>
     <div class="card">
       <h3>Menu (${DATA.services.length})</h3>
       <div id="svcList">${renderSvcList()}</div>
@@ -733,9 +792,26 @@ function pageServices(){
 function renderSvcList(){
   if(!DATA.services.length) return `<div class="empty-state">No services yet.</div>`;
   return DATA.services.map(s=>`
-    <div class="list-row">
-      <div class="main"><b>${esc(s.name)}</b><div class="m2">${esc(s.category)} · ₱${s.price} · ${s.duration} min — ${esc(s.desc||"")}</div></div>
-      <div class="acts"><button class="icon-btn del" data-del="${s.id}" title="Delete">✕</button></div>
+    <div class="list-row" style="display:block;">
+      <div class="hair-row-top">
+        <div class="main"><b>${esc(s.name)}</b><div class="m2">${esc(s.category)} · ₱${s.price} · ${s.duration} min${s.desc?(" — "+esc(s.desc)):""}</div></div>
+        <div class="acts">
+          <button class="icon-btn" data-edit-svc="${s.id}" title="Edit">✎</button>
+          <button class="icon-btn del" data-del="${s.id}" title="Delete">✕</button>
+        </div>
+      </div>
+      <div class="hair-edit-editor" id="svcEdit${s.id}">
+        <div class="row3">
+          <div class="field"><label for="svcName${s.id}">Name</label><input id="svcName${s.id}" data-svc-name="${s.id}" value="${esc(s.name)}"></div>
+          <div class="field"><label for="svcCat${s.id}">Category</label><select id="svcCat${s.id}" data-svc-cat="${s.id}">${svcCatOptions(s.category)}</select></div>
+          <div class="field"><label for="svcPrice${s.id}">Price (₱)</label><input id="svcPrice${s.id}" data-svc-price="${s.id}" type="number" min="0" value="${s.price}"></div>
+        </div>
+        <div class="row2" style="margin-top:14px;">
+          <div class="field"><label for="svcDur${s.id}">Duration (minutes)</label><input id="svcDur${s.id}" data-svc-dur="${s.id}" type="number" min="5" step="5" value="${s.duration}"></div>
+          <div class="field"><label for="svcDesc${s.id}">Short Description</label><input id="svcDesc${s.id}" data-svc-desc="${s.id}" value="${esc(s.desc||"")}"></div>
+        </div>
+        <button class="btn btn-solid btn-sm" data-svc-save="${s.id}" style="margin-top:14px;"><span>Save Changes</span></button>
+      </div>
     </div>`).join("");
 }
 
@@ -993,25 +1069,77 @@ function wireAdminPage(page){
     });
   }
   if(page==="haircuts"){
-    const addOne = async (idx)=>{
-      const h = HAIRCUT_CATALOG[idx];
-      if(DATA.services.some(s=>s.name.toLowerCase()===h.n.toLowerCase())){ toast("That style is already in Services.","err"); return; }
-      DATA.services.push({id:uid(), category:h.c, name:h.n, price:0, duration:30, desc:"Haircut inspiration style."});
-      if(await persist()){ toast(h.n+" added to Services.","ok"); }
-    };
-    const refreshHaircutList = ()=>{ $("#haircutAdminList").innerHTML = HAIRCUT_CATALOG.map((h,i)=>renderHaircutRow(h,i)).join(""); };
-    $("#haircutAdminList").addEventListener("click", async e=>{
-      const add=e.target.closest("[data-add-haircut]");
-      if(add){ await addOne(+add.dataset.addHaircut); return; }
+    const refreshHaircutList = ()=>{ $("#haircutAdminList").innerHTML = DATA.haircutCatalog.map(h=>renderHaircutRow(h)).join(""); };
 
-      const toggle=e.target.closest("[data-photo-toggle]");
-      if(toggle){ $("#hairPhotoEditor"+toggle.dataset.photoToggle).classList.toggle("open"); return; }
+    $("#addCat").onclick = async ()=>{
+      const name = $("#newCatName").value.trim(); if(!name){ toast("Please name the category.","err"); return; }
+      DATA.haircutCategories.push({id:uid(), name});
+      if(await persist()){ toast("Category added.","ok"); renderAdminPage(); }
+    };
+    $("#catList").addEventListener("change", async e=>{
+      const nameInput = e.target.closest("[data-cat-name]");
+      if(nameInput){
+        const cat = DATA.haircutCategories.find(c=>c.id===nameInput.dataset.catName);
+        const val = nameInput.value.trim();
+        if(!val){ toast("Category name can't be empty.","err"); nameInput.value = cat.name; return; }
+        cat.name = val;
+        if(await persist()){ toast("Category renamed.","ok"); refreshHaircutList(); }
+      }
+    });
+    $("#catList").addEventListener("keydown", e=>{
+      if(e.key==="Enter" && e.target.matches("[data-cat-name]")){ e.preventDefault(); e.target.blur(); }
+    });
+    $("#catList").addEventListener("click", async e=>{
+      const del = e.target.closest("[data-del-cat]");
+      if(!del) return;
+      const id = del.dataset.delCat;
+      const inUse = DATA.haircutCatalog.filter(h=>h.categoryId===id).length;
+      if(inUse && !confirm(`${inUse} style(s) use this category. Delete it anyway? They'll become "Uncategorized".`)) return;
+      DATA.haircutCategories = DATA.haircutCategories.filter(c=>c.id!==id);
+      DATA.haircutCatalog.forEach(h=>{ if(h.categoryId===id) h.categoryId=""; });
+      if(await persist()){ toast("Category deleted.","ok"); renderAdminPage(); }
+    });
+
+    $("#addStyle").onclick = async ()=>{
+      const name = $("#newStyleName").value.trim(); if(!name){ toast("Please add a style name.","err"); return; }
+      const categoryId = $("#newStyleCat").value;
+      DATA.haircutCatalog.push({id:uid(), name, categoryId, image:""});
+      if(await persist()){ toast(name+" added.","ok"); $("#newStyleName").value=""; renderAdminPage(); }
+    };
+
+    $("#haircutAdminList").addEventListener("click", async e=>{
+      const editToggle=e.target.closest("[data-edit-toggle]");
+      if(editToggle){ $("#hairEditEditor"+editToggle.dataset.editToggle).classList.toggle("open"); return; }
+
+      const photoToggle=e.target.closest("[data-photo-toggle]");
+      if(photoToggle){ $("#hairPhotoEditor"+photoToggle.dataset.photoToggle).classList.toggle("open"); return; }
+
+      const nameSave=e.target.closest("[data-hair-name-save]");
+      if(nameSave){
+        const id = nameSave.dataset.hairNameSave;
+        const h = DATA.haircutCatalog.find(x=>x.id===id);
+        const newName = $(`[data-hair-name="${id}"]`).value.trim();
+        if(!newName){ toast("Style name can't be empty.","err"); return; }
+        h.name = newName;
+        h.categoryId = $(`[data-hair-cat="${id}"]`).value;
+        if(await persist()){ toast("Style updated.","ok"); refreshHaircutList(); }
+        return;
+      }
+
+      const delStyle=e.target.closest("[data-del-style]");
+      if(delStyle){
+        const id = delStyle.dataset.delStyle;
+        if(!confirm("Delete this style? This can't be undone.")) return;
+        DATA.haircutCatalog = DATA.haircutCatalog.filter(h=>h.id!==id);
+        if(await persist()){ toast("Style deleted.","ok"); renderAdminPage(); }
+        return;
+      }
 
       const save=e.target.closest("[data-hair-save]");
       if(save){
-        const idx = +save.dataset.hairSave;
-        const urlInput = $(`[data-hair-url="${idx}"]`);
-        const fileInput = $(`[data-hair-file="${idx}"]`);
+        const id = save.dataset.hairSave;
+        const urlInput = $(`[data-hair-url="${id}"]`);
+        const fileInput = $(`[data-hair-file="${id}"]`);
         const file = fileInput.files[0];
         let url = urlInput.value.trim();
         if(!file && !url){ toast("Add an image URL or upload a photo.","err"); return; }
@@ -1019,10 +1147,12 @@ function wireAdminPage(page){
         try{
           url = file ? await resizeImageFile(file, 1000) : normalizeImageUrl(url);
         }catch(err){ toast("Could not read that image.","err"); save.disabled = false; return; }
-        DATA.haircutImages[idx] = url;
+        const h = DATA.haircutCatalog.find(x=>x.id===id);
+        const prev = h.image;
+        h.image = url;
         const ok = await persist();
         save.disabled = false;
-        if(!ok){ delete DATA.haircutImages[idx]; return; }
+        if(!ok){ h.image = prev; return; }
         toast("Photo saved.","ok");
         refreshHaircutList();
         return;
@@ -1030,44 +1160,46 @@ function wireAdminPage(page){
 
       const remove=e.target.closest("[data-hair-remove]");
       if(remove){
-        const idx = +remove.dataset.hairRemove;
-        const prev = DATA.haircutImages[idx];
-        delete DATA.haircutImages[idx];
+        const id = remove.dataset.hairRemove;
+        const h = DATA.haircutCatalog.find(x=>x.id===id);
+        const prev = h.image;
+        h.image = "";
         if(await persist()){ toast("Photo removed.","ok"); refreshHaircutList(); }
-        else{ DATA.haircutImages[idx] = prev; }
+        else{ h.image = prev; }
         return;
       }
     });
-    $("#addAllHaircuts").onclick=async()=>{
-      let added=0;
-      HAIRCUT_CATALOG.forEach(h=>{
-        if(!DATA.services.some(s=>s.name.toLowerCase()===h.n.toLowerCase())){
-          DATA.services.push({id:uid(), category:h.c, name:h.n, price:0, duration:30, desc:"Haircut inspiration style."}); added++;
-        }
-      });
-      if(await persist()){ toast(added+" haircut styles added to Services.","ok"); }
-    };
   }
   if(page==="services"){
-    $("#openHaircutCatalog").onclick = ()=>{ adminPage="haircuts"; $all("#adminNav a").forEach(x=>x.classList.toggle("active", x.dataset.p==="haircuts")); renderAdminPage(); };
-    $("#addAllHaircutsServices").onclick = async ()=>{
-      let added=0;
-      HAIRCUT_CATALOG.forEach(h=>{
-        if(!DATA.services.some(s=>s.name.toLowerCase()===h.n.toLowerCase())){
-          DATA.services.push({id:uid(), category:h.c, name:h.n, price:0, duration:30, desc:"Haircut inspiration style."}); added++;
-        }
-      });
-      if(await persist()){ toast(added+" haircut styles added to Services.","ok"); renderAdminPage(); }
-    };
     $("#addSvc").onclick = async ()=>{
       const name = $("#s_name").value.trim(); if(!name){ toast("Please add a service name.","err"); return; }
-      DATA.services.push({ id:uid(), name, category:$("#s_cat").value.trim()||"General", price:+$("#s_price").value||0, duration:+$("#s_dur").value||30, desc:$("#s_desc").value.trim() });
+      DATA.services.push({ id:uid(), name, category:$("#s_cat").value, price:+$("#s_price").value||0, duration:+$("#s_dur").value||30, desc:$("#s_desc").value.trim() });
       if(await persist()){ toast("Service added.","ok"); renderAdminPage(); }
     };
     $("#svcList").addEventListener("click", async e=>{
-      const d = e.target.closest("[data-del]"); if(!d) return;
-      DATA.services = DATA.services.filter(s=>s.id!==d.dataset.del);
-      if(await persist()){ $("#svcList").innerHTML = renderSvcList(); toast("Service removed.","ok"); }
+      const editToggle = e.target.closest("[data-edit-svc]");
+      if(editToggle){ $("#svcEdit"+editToggle.dataset.editSvc).classList.toggle("open"); return; }
+
+      const save = e.target.closest("[data-svc-save]");
+      if(save){
+        const id = save.dataset.svcSave;
+        const s = DATA.services.find(x=>x.id===id);
+        const name = $(`[data-svc-name="${id}"]`).value.trim();
+        if(!name){ toast("Service name can't be empty.","err"); return; }
+        s.name = name;
+        s.category = $(`[data-svc-cat="${id}"]`).value;
+        s.price = +$(`[data-svc-price="${id}"]`).value || 0;
+        s.duration = +$(`[data-svc-dur="${id}"]`).value || 30;
+        s.desc = $(`[data-svc-desc="${id}"]`).value.trim();
+        if(await persist()){ toast("Service updated.","ok"); $("#svcList").innerHTML = renderSvcList(); }
+        return;
+      }
+
+      const d = e.target.closest("[data-del]");
+      if(d){
+        DATA.services = DATA.services.filter(s=>s.id!==d.dataset.del);
+        if(await persist()){ $("#svcList").innerHTML = renderSvcList(); toast("Service removed.","ok"); }
+      }
     });
   }
   if(page==="hours"){
