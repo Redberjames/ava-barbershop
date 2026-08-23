@@ -197,7 +197,7 @@ img{max-width:100%; display:block;}
 
 /* ---- Contact : curtain reveal ---- */
 @keyframes pgEnterContact{ from{ opacity:1; clip-path:inset(48% 0 48% 0); } to{ opacity:1; clip-path:inset(0 0 0 0); } }
-@keyframes pgLeaveContact{ to{ opacity:1; clip-path:inset(0 48% 0 48%); } }
+@keyframes pgLeaveContact{ to{ opacity:0; clip-path:inset(0 50% 0 50%); } }
 .page.entering-contact{ animation:pgEnterContact var(--pg-dur) var(--ease) both; }
 .page.leaving-contact{ animation:pgLeaveContact calc(var(--pg-dur) * .7) var(--ease) both; }
 
@@ -1894,10 +1894,17 @@ function goToPage(id, opts={}){
   document.title = PAGE_TITLES[id] || document.title;
 
   const DURATION = 900;
+  const LEAVE_DURATION = 675; // covers both the .7x and .75x leave-animation multipliers used above
+  if(prevEl && prevEl !== target){
+    window.setTimeout(()=>{
+      // Only clean up if this element is still actually the one leaving —
+      // a later, faster navigation could have already reused/reset it.
+      if(prevEl.classList.contains("leaving-"+prevId)){
+        prevEl.classList.remove("is-active","is-leaving","leaving-"+prevId);
+      }
+    }, LEAVE_DURATION);
+  }
   transitionTimer = window.setTimeout(()=>{
-    if(prevEl && prevEl !== target){
-      prevEl.classList.remove("is-active","is-leaving","leaving-"+prevId);
-    }
     target.classList.remove("entering-"+id, "is-entering");
     pageTransitioning = false;
     transitionTimer = null;
