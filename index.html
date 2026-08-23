@@ -73,6 +73,8 @@ img{max-width:100%; display:block;}
 }
 .vignette{position:fixed; inset:0; pointer-events:none; z-index:8999;
   background:radial-gradient(ellipse at 50% 0%, transparent 40%, rgba(0,0,0,.55) 100%);}
+.skip-link{ position:fixed; top:-100px; left:14px; z-index:20000; background:var(--gold-2); color:#100e0a; font-weight:700; font-size:13px; padding:12px 18px; border-radius:8px; transition:top .2s var(--ease); }
+.skip-link:focus{ top:14px; }
 .btn{
   display:inline-flex; align-items:center; justify-content:center; gap:10px;
   padding:15px 30px; border-radius:2px; border:1px solid var(--accent);
@@ -145,7 +147,16 @@ img{max-width:100%; display:block;}
   padding-top:var(--nav-h);
   opacity:0; visibility:hidden; pointer-events:none;
   z-index:1; will-change:transform,opacity,clip-path;
+  display:flex; flex-direction:column;
 }
+/* The content section grows to fill any leftover vertical space, so the
+   shared #footer (appended as the page's second child by the router) always
+   sits flush at the bottom of the viewport on short pages, instead of
+   floating up right under sparse content. On tall pages this has no visual
+   effect — the section already exceeds the viewport and the page scrolls
+   normally, with the footer following right after it as before. */
+.page > section{ flex:1 0 auto; }
+.page > #footer{ flex:none; }
 #page-hero{ padding-top:0; } /* hero manages its own top clearance for the nav */
 .page.is-active{ opacity:1; visibility:visible; pointer-events:auto; z-index:2; }
 .page.is-leaving{ z-index:3; }
@@ -375,10 +386,10 @@ img{max-width:100%; display:block;}
 .review-form{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-lg); padding:12px 14px; margin-top:24px; max-width:460px; }
 .review-form h3{ font-family:'Jost'; font-weight:600; font-size:15px; letter-spacing:.02em; }
 .review-form .helptext{ font-size:11.5px; color:var(--ink-faint); margin-top:4px; }
-.star-input{ display:inline-flex; gap:4px; font-size:17px; line-height:1; cursor:pointer; }
-.star-input span{ color:var(--line); transition:color .15s, transform .15s; }
-.star-input span.on{ color:var(--accent); }
-.star-input span:hover{ transform:scale(1.12); }
+.star-input{ display:inline-flex; gap:4px; font-size:17px; line-height:1; }
+.star-input button{ appearance:none; -webkit-appearance:none; border:0; background:none; padding:0; margin:0; font:inherit; cursor:pointer; color:var(--line); transition:color .15s, transform .15s; }
+.star-input button.on{ color:var(--accent); }
+.star-input button:hover{ transform:scale(1.12); }
 
 
 /* ============================= HOURS / CONTACT ============================= */
@@ -400,7 +411,8 @@ img{max-width:100%; display:block;}
 .cal-nav button:hover{ color:#100e0a; border-color:var(--gold); background:var(--gold); transform:translateY(-1px); }
 .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:5px 4px; text-align:center; justify-items:center; }
 .cal-grid .dow{ font-size:9.5px; letter-spacing:.12em; color:var(--gold-dim); padding-bottom:5px; text-transform:uppercase; font-weight:600;}
-.cal-day{ aspect-ratio:1; width:28px; max-height:28px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:13px; color:var(--ink-dim); cursor:pointer; position:relative; border:1px solid transparent; transition:background .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease),transform .15s var(--ease),box-shadow .2s var(--ease); }
+.cal-day{ appearance:none; -webkit-appearance:none; font:inherit; margin:0; aspect-ratio:1; width:28px; max-height:28px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:13px; color:var(--ink-dim); cursor:pointer; position:relative; border:1px solid transparent; background:none; transition:background .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease),transform .15s var(--ease),box-shadow .2s var(--ease); }
+.cal-day:disabled{ cursor:not-allowed; }
 .cal-day.empty{ visibility:hidden; }
 .cal-day.past{ color:var(--ink-faint); opacity:.28; cursor:not-allowed; }
 .cal-day.closed{ color:var(--ink-faint); opacity:.35; cursor:not-allowed; text-decoration:line-through; }
@@ -462,12 +474,12 @@ img{max-width:100%; display:block;}
 .foot-brand{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .foot-brand img{ width:24px; height:24px; object-fit:contain; }
 .foot-brand .bn{ font-family:'Bebas Neue'; font-size:15px; letter-spacing:.03em; }
-.foot-tagline{ color:var(--ink-faint); font-size:11.5px; }
+.foot-tagline{ color:var(--ink-dim); font-size:11.5px; }
 .foot-links{ display:flex; gap:16px; flex-wrap:wrap; }
-.foot-links a{ color:var(--ink-faint); font-size:12px; transition:color .25s; }
+.foot-links a{ color:var(--ink-dim); font-size:12px; transition:color .25s; }
 .foot-links a:hover{ color:var(--accent); }
-.foot-copy{ color:var(--ink-faint); font-size:11.5px; white-space:nowrap; }
-.foot-copy a{ color:var(--ink-faint); text-decoration:underline; text-underline-offset:2px; }
+.foot-copy{ color:var(--ink-dim); font-size:11.5px; white-space:nowrap; }
+.foot-copy a{ color:var(--ink-dim); text-decoration:underline; text-underline-offset:2px; }
 .foot-copy a:hover{ color:var(--accent); }
 .social-row{ display:flex; gap:10px; margin-top:18px; }
 .social-row a{ width:36px; height:36px; border:1px solid var(--line); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--ink-dim); }
@@ -629,7 +641,8 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
 
 <div class="grain"></div>
 <div class="vignette"></div>
-<div class="toast-wrap" id="toastWrap"></div>
+<a href="#main-content" class="skip-link">Skip to content</a>
+<div class="toast-wrap" id="toastWrap" role="status" aria-live="polite"></div>
 
 <div id="loader">
   <img alt="" src="logo-large.webp">
@@ -666,6 +679,7 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
     </div>
   </nav>
 
+  <div id="main-content" tabindex="-1"></div>
   <div class="page" id="page-hero" data-page="hero">
   <section id="hero">
     <div class="hero-grid">
@@ -790,9 +804,9 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
           <div class="slots" id="slotsWrap"></div>
         </div>
         <div>
-          <div class="field"><label for="bkName">Full Name</label><input id="bkName" placeholder="Juan Dela Cruz"></div>
+          <div class="field"><label for="bkName">Full Name</label><input id="bkName" autocomplete="name" placeholder="Juan Dela Cruz"></div>
           <div class="row2" style="margin-top:14px;">
-            <div class="field"><label for="bkPhone">Phone Number</label><input id="bkPhone" placeholder="+63 9xx xxx xxxx"></div>
+            <div class="field"><label for="bkPhone">Phone Number</label><input id="bkPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+63 9xx xxx xxxx"></div>
             <div class="field"><label for="bkService">Service</label><select id="bkService"></select></div>
           </div>
           <div class="field" style="margin-top:14px;"><label for="bkNotes">Notes (optional)</label><textarea id="bkNotes" placeholder="Any preference for barber or style..."></textarea></div>
@@ -816,7 +830,7 @@ body{background-image:radial-gradient(circle at 50% -10%,rgba(201,162,76,.055),t
           <div class="eyebrow" style="margin-bottom:5px;">Your Experience</div>
           <h3>Rate Your Visit</h3>
           <div class="helptext">Share your experience with the shop. Reviews are checked before they go live.</div>
-          <div class="field" style="margin-top:8px;"><label>Your Rating</label><div class="star-input" id="rvStars"><span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span></div></div>
+          <div class="field" style="margin-top:8px;"><label id="rvStarsLabel">Your Rating</label><div class="star-input" id="rvStars" role="radiogroup" aria-labelledby="rvStarsLabel"><button type="button" data-v="1" role="radio" aria-checked="false" aria-label="1 star">★</button><button type="button" data-v="2" role="radio" aria-checked="false" aria-label="2 stars">★</button><button type="button" data-v="3" role="radio" aria-checked="false" aria-label="3 stars">★</button><button type="button" data-v="4" role="radio" aria-checked="false" aria-label="4 stars">★</button><button type="button" data-v="5" role="radio" aria-checked="false" aria-label="5 stars">★</button></div></div>
           <div class="field" style="margin-top:8px;"><label for="rvName">Your Name</label><input id="rvName" placeholder="Juan Dela Cruz"></div>
           <div class="field" style="margin-top:8px;"><label for="rvText">Your Review</label><textarea id="rvText" rows="2" placeholder="Tell us about your visit..."></textarea></div>
           <button class="btn btn-solid" id="rvSubmit" style="margin-top:10px; width:100%;"><span>Submit Review</span></button>
@@ -1463,16 +1477,22 @@ function initReviewForm(){
   const wrap = $("#rvStars");
   if(!wrap || wrap.dataset.wired) { paintStars(); return; }
   wrap.dataset.wired = "1";
-  $all("span", wrap).forEach(s=>{
+  $all("button", wrap).forEach(s=>{
     s.addEventListener("mouseenter", ()=> paintStars(+s.dataset.v));
     s.addEventListener("mouseleave", ()=> paintStars());
+    s.addEventListener("focus", ()=> paintStars(+s.dataset.v));
+    s.addEventListener("blur", ()=> paintStars());
     s.addEventListener("click", ()=>{ selectedRating = +s.dataset.v; paintStars(); });
   });
   $("#rvSubmit").addEventListener("click", submitReview);
 }
 function paintStars(hoverVal){
   const v = hoverVal || selectedRating;
-  $all("#rvStars span").forEach(s=> s.classList.toggle("on", +s.dataset.v <= v));
+  $all("#rvStars button").forEach(s=>{
+    const sv = +s.dataset.v;
+    s.classList.toggle("on", sv <= v);
+    s.setAttribute("aria-checked", sv === selectedRating ? "true" : "false");
+  });
 }
 async function submitReview(){
   const name = $("#rvName").value.trim();
@@ -1591,11 +1611,14 @@ function renderCal(){
     else if(isFull) cls += " full";
     if(d.getTime()===today.getTime()) cls += " today";
     if(key===selectedDateKey) cls += " sel";
-    html += `<div class="${cls}" data-key="${key}">${day}${(!isPast && !isClosed && taken>0 && !isFull)?'<span class="d"></span>':''}</div>`;
+    const unavailable = isPast || isClosed || isFull;
+    const dateLabel = `${MONTHS[d.getMonth()]} ${day}, ${d.getFullYear()}`;
+    const statusLabel = isPast ? "past date" : isClosed ? "closed" : isFull ? "fully booked" : (taken>0 ? "some slots booked" : "available");
+    html += `<button type="button" class="${cls}" data-key="${key}" ${unavailable?"disabled":""} aria-pressed="${key===selectedDateKey}" aria-label="${dateLabel}, ${statusLabel}">${day}${(!isPast && !isClosed && taken>0 && !isFull)?'<span class="d" aria-hidden="true"></span>':''}</button>`;
   }
   $("#calGrid").innerHTML = html;
   $all(".cal-day").forEach(el=>{
-    if(el.classList.contains("empty") || el.classList.contains("past") || el.classList.contains("closed") || el.classList.contains("full")) return;
+    if(el.disabled) return;
     el.addEventListener("click", ()=>{
       selectedDateKey = (selectedDateKey === el.dataset.key) ? null : el.dataset.key;
       selectedSlot = null;
