@@ -157,6 +157,7 @@ img{max-width:100%; display:block;}
    normally, with the footer following right after it as before. */
 .page > section{ flex:1 0 auto; }
 .page > #footer{ flex:none; }
+.page > #announce-strip{ flex:none; }
 #page-hero{ padding-top:0; } /* hero manages its own top clearance for the nav */
 .page.is-active{ opacity:1; visibility:visible; pointer-events:auto; z-index:2; }
 .page.is-leaving{ z-index:3; }
@@ -327,7 +328,7 @@ img{max-width:100%; display:block;}
 
 /* ============================= SERVICES ============================= */
 .svc-tabs{ display:flex; gap:10px; margin-bottom:36px; flex-wrap:wrap; }
-.svc-tab{ padding:9px 18px; border:1px solid var(--line); border-radius:30px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-dim); }
+.svc-tab{ appearance:none; -webkit-appearance:none; padding:9px 18px; border:1px solid var(--line); border-radius:30px; font:inherit; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-dim); background:transparent; }
 .svc-tab.active{ background:var(--accent); color:#100e0a; border-color:var(--accent); font-weight:600; }
 .svc-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
 .svc-card{ background:linear-gradient(160deg,var(--panel),var(--bg-2)); border:1px solid var(--line); border-radius:var(--radius-lg); padding:20px 22px; position:relative; transform-style:preserve-3d; }
